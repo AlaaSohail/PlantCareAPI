@@ -12,15 +12,23 @@ const authMiddleware = (req, res, next) => {
 
             return res.status(401).json({
 
-                success:false,
-                message:"No token provided"
+                success: false,
+                message: "No token provided"
 
             });
 
         }
+        const parts = authHeader.split(" ");
 
+        if (parts.length !== 2 || parts[0] !== "Bearer") {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid authorization format"
+            });
+        }
 
-        const token = authHeader.split(" ")[1];
+        const token = parts[1];
+
 
 
         const decoded = jwt.verify(
@@ -35,13 +43,13 @@ const authMiddleware = (req, res, next) => {
         next();
 
 
-    } catch(error) {
+    } catch (error) {
 
 
         return res.status(401).json({
 
-            success:false,
-            message:"Invalid token"
+            success: false,
+            message: "Invalid token"
 
         });
 

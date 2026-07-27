@@ -1,26 +1,67 @@
 require("dotenv").config();
-require("dotenv").config();
 
-console.log("Current folder:");
-console.log(process.cwd());
-
-console.log("Env files:");
-const fs = require("fs");
-console.log(fs.readdirSync(process.cwd()));
 const app = require("./src/app");
 
 const db = require("./src/config/database");
 
+const helmet = require("helmet");
+const cors = require("cors");
+const rateLimit = require("express-rate-limit");
+
+
+// Security Middleware
+
+app.use(helmet());
+
+
+app.use(cors({
+
+    origin:[
+        "https://alaasohail.com",
+        "https://www.alaasohail.com"
+    ],
+
+    methods:[
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+    ],
+
+    credentials:true
+
+}));
+
+
+const limiter = rateLimit({
+
+    windowMs:15 * 60 * 1000,
+
+    max:100,
+
+    message:{
+        success:false,
+        message:"Too many requests, try again later"
+    }
+
+});
+
+
+app.use("/api", limiter);
+
+
+
+// Database
 
 db.connect()
-.then(client => {
+.then(client=>{
 
     console.log("✅ Database Connected");
 
     client.release();
 
 })
-.catch(err => {
+.catch(err=>{
 
     console.log("❌ Database Error");
     console.log(err);
@@ -28,11 +69,14 @@ db.connect()
 });
 
 
+
+// Server
+
 const PORT = process.env.PORT || 3000;
 
 
-app.listen(PORT, () => {
+app.listen(PORT,()=>{
 
-console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 
 });

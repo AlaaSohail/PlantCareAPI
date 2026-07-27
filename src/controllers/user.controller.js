@@ -1,7 +1,7 @@
 const User = require("../models/user.model");
 
 
-const profile = async (req,res)=>{
+const profile = async (req, res) => {
 
 
     try {
@@ -12,12 +12,12 @@ const profile = async (req,res)=>{
         );
 
 
-        if(!user){
+        if (!user) {
 
             return res.status(404).json({
 
-                success:false,
-                message:"User not found"
+                success: false,
+                message: "User not found"
 
             });
 
@@ -26,15 +26,20 @@ const profile = async (req,res)=>{
 
         res.json({
 
-            success:true,
+            success: true,
 
-            user
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                image: user.image
+            }
 
         });
 
 
 
-    } catch(error){
+    } catch (error) {
 
 
         console.log(error);
@@ -42,8 +47,8 @@ const profile = async (req,res)=>{
 
         res.status(500).json({
 
-            success:false,
-            message:"Server error"
+            success: false,
+            message: "Server error"
 
         });
 
