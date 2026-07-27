@@ -4,10 +4,8 @@ const cors = require("cors");
 const app = express();
 
 
-app.use(cors());
 
 
-// مهم جدًا قبل الـ routes
 app.use(express.json());
 
 
@@ -20,7 +18,7 @@ app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
     res.json({
-        message: "Masaar API Running"
+        "message": "PlantCare API Running"
     });
 });
 const userRoutes =
@@ -28,7 +26,7 @@ const userRoutes =
 
 
 app.use(
-    "/api/user",
+    "/api/users",
     userRoutes
 );
 const plantRoutes =
