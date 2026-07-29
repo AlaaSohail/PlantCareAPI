@@ -2,8 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const Token = require("../models/token.model");
-const sendResetEmail =
-    require("../services/email.service");
+const sendEmail = require("../services/email.service");
 
 const register = async (req, res) => {
 
@@ -36,16 +35,11 @@ const register = async (req, res) => {
 
         }
 
-        console.log("USER RESULT:", existingUser);
-        // تشفير كلمة المرور
-        console.log("START HASH");
+
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        console.log("HASH DONE");
 
-
-        console.log("START CREATE");
 
         const user = await User.create({
             name,
@@ -53,7 +47,6 @@ const register = async (req, res) => {
             password: hashedPassword
         });
 
-        console.log("CREATE DONE");
 
         res.status(201).json({
 
@@ -201,14 +194,12 @@ const logout = async (req, res) => {
 
         const token = authHeader.split(" ")[1];
 
-        console.log("LOGOUT TOKEN:", token);
 
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET
         );
 
-        console.log(decoded);
 
         const expiresAt = new Date(decoded.exp * 1000);
 
@@ -224,7 +215,6 @@ const logout = async (req, res) => {
 
     } catch (error) {
 
-        console.log(error);
 
         res.status(401).json({
             success: false,
@@ -261,8 +251,8 @@ const forgotPassword = async (req, res) => {
             token,
             expire
         );
-        await sendResetEmail(
-            email,
+        await sendEmail(
+            user.email,
             token
         );
         res.json({
