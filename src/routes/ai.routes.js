@@ -20,31 +20,19 @@ const {
 } = require("../controllers/ai.controller");
 
 
-
 router.post(
-
-    "/analyze",
-
+    "/plants/:id/analyze",
     authMiddleware,
-
     upload.single("image"),
-
     analyzePlant
-
 );
-
 
 
 router.get(
-
-    "/history",
-
+    "/plants/:id/history",
     authMiddleware,
-
     getAnalysis
-
 );
-
 
 
 module.exports = router;
