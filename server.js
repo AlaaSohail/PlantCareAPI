@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+console.log("DATABASE_URL:", process.env.DATABASE_URL);
 const app = require("./src/app");
 
 const db = require("./src/config/database");
@@ -16,32 +16,32 @@ app.use(helmet());
 
 app.use(cors({
 
-    origin:[
+    origin: [
         "https://alaasohail.com",
         "https://www.alaasohail.com"
     ],
 
-    methods:[
+    methods: [
         "GET",
         "POST",
         "PUT",
         "DELETE"
     ],
 
-    credentials:true
+    credentials: true
 
 }));
 
 
 const limiter = rateLimit({
 
-    windowMs:15 * 60 * 1000,
+    windowMs: 15 * 60 * 1000,
 
-    max:100,
+    max: 100,
 
-    message:{
-        success:false,
-        message:"Too many requests, try again later"
+    message: {
+        success: false,
+        message: "Too many requests, try again later"
     }
 
 });
@@ -54,19 +54,19 @@ app.use("/api", limiter);
 // Database
 
 db.connect()
-.then(client=>{
+    .then(client => {
 
-    console.log("✅ Database Connected");
+        console.log("✅ Database Connected");
 
-    client.release();
+        client.release();
 
-})
-.catch(err=>{
+    })
+    .catch(err => {
 
-    console.log("❌ Database Error");
-    console.log(err);
+        console.log("❌ Database Error");
+        console.log(err);
 
-});
+    });
 
 
 
@@ -75,7 +75,7 @@ db.connect()
 const PORT = process.env.PORT || 3000;
 
 
-app.listen(PORT,()=>{
+app.listen(PORT, () => {
 
     console.log(`🚀 Server running on port ${PORT}`);
 
