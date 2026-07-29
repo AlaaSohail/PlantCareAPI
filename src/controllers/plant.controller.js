@@ -317,33 +317,88 @@ const updatePlant = async (req, res) => {
 
         const {
             name,
-            species,
-            image_url
+            species
         } = req.body;
 
 
-        const plant =
-            await Plant.update(
+        const {
+            deleteImage
+        } = require("../services/cloudinary.service");
+
+
+        // جلب النبتة القديمة
+        const oldPlant =
+            await Plant.findById(
                 req.params.id,
-                req.user.id,
-                {
-                    name,
-                    species,
-                    image_url
-                }
+                req.user.id
             );
 
 
-        if (!plant) {
+        if (!oldPlant) {
 
             return res.status(404).json({
 
                 success: false,
+
                 message: "Plant not found"
 
             });
 
         }
+
+
+
+        let image_url =
+            oldPlant.image_url;
+
+
+        let image_public_id =
+            oldPlant.image_public_id;
+
+
+
+        // إذا رفع صورة جديدة
+        if (req.file) {
+
+
+            // حذف القديمة
+            if (oldPlant.image_public_id) {
+
+                await deleteImage(
+                    oldPlant.image_public_id
+                );
+
+            }
+
+
+            // حفظ الجديدة
+            image_url =
+                req.file.path;
+
+
+            image_public_id =
+                req.file.filename;
+
+        }
+
+
+
+        const plant =
+            await Plant.update(
+
+                req.params.id,
+
+                req.user.id,
+
+                {
+                    name,
+                    species,
+                    image_url,
+                    image_public_id
+                }
+
+            );
+
 
 
         res.json({
@@ -356,7 +411,6 @@ const updatePlant = async (req, res) => {
 
 
     } catch (error) {
-
 
         console.log(error);
 
