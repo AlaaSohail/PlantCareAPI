@@ -2,7 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const Token = require("../models/token.model");
-
+const sendResetEmail =
+    require("../services/email.service");
 
 const register = async (req, res) => {
 
@@ -260,7 +261,10 @@ const forgotPassword = async (req, res) => {
             token,
             expire
         );
-
+        await sendResetEmail(
+            email,
+            token
+        );
         res.json({
             success: true,
             message: "Reset token created",
