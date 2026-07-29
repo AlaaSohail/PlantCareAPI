@@ -2,22 +2,18 @@ const express = require("express");
 
 const router = express.Router();
 
-
 const upload =
     require("../middleware/upload.middleware");
-
 
 const authMiddleware =
     require("../middleware/auth.middleware");
 
 
 const {
-
     analyzePlant,
-
     getAnalysis
-
 } = require("../controllers/ai.controller");
+
 
 
 router.post(
@@ -28,11 +24,13 @@ router.post(
 );
 
 
+
 router.get(
     "/plants/:id/history",
     authMiddleware,
     getAnalysis
 );
+
 
 
 module.exports = router;
