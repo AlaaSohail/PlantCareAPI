@@ -59,14 +59,6 @@ const analyzePlant = async (req, res) => {
 
 
 
-        /*
-        مثال النتيجة:
-        {
-          disease:"Leaf spot",
-          confidence:90,
-          recommendation:"..."
-        }
-        */
 
 
 
@@ -79,7 +71,7 @@ const analyzePlant = async (req, res) => {
 
                 disease: aiResult.disease,
 
-                confidence: aiResult.confidence,
+                confidence: Number(aiResult.confidence),
 
                 recommendation:
                     aiResult.recommendation,

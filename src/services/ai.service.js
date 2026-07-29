@@ -1,5 +1,5 @@
 const OpenAI = require("openai");
-const fs = require("fs");
+const axios = require("axios");
 
 
 const client = new OpenAI({
@@ -10,11 +10,20 @@ const client = new OpenAI({
 
 
 
-const analyzePlantImage = async (imagePath) => {
+const analyzePlantImage = async (imageUrl) => {
+
+
+    const imageBuffer =
+        await axios.get(
+            imageUrl,
+            {
+                responseType: "arraybuffer"
+            }
+        );
 
 
     const imageBase64 =
-        fs.readFileSync(imagePath)
+        Buffer.from(imageBuffer.data)
             .toString("base64");
 
 
@@ -71,7 +80,7 @@ Rules:
                             type: "input_image",
 
                             image_url:
-                                `data:image/jpeg;base64,${imageBase64}`
+                                `data:${imageBuffer.headers["content-type"]};base64,${imageBase64}`
 
                         }
 
@@ -92,29 +101,10 @@ Rules:
 
 
 
-    return {
-
-        plant_name: result.plant_name,
-
-        health_status: result.health_status,
-
-        disease: result.disease,
-
-        confidence: result.confidence,
-
-        recommendation: result.recommendation,
-
-        watering_advice: result.watering_advice,
-
-        sunlight_advice: result.sunlight_advice,
-
-        fertilizer_advice: result.fertilizer_advice
-
-    };
+    return result;
 
 
 };
-
 
 
 module.exports = analyzePlantImage;
