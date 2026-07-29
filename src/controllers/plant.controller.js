@@ -255,7 +255,67 @@ const getPlantDetails = async (req, res) => {
     }
 
 };
+const updatePlant = async (req, res) => {
 
+    try {
+
+        const {
+            name,
+            species,
+            image_url
+        } = req.body;
+
+
+        const plant =
+            await Plant.update(
+                req.params.id,
+                req.user.id,
+                {
+                    name,
+                    species,
+                    image_url
+                }
+            );
+
+
+        if (!plant) {
+
+            return res.status(404).json({
+
+                success:false,
+                message:"Plant not found"
+
+            });
+
+        }
+
+
+        res.json({
+
+            success:true,
+
+            plant
+
+        });
+
+
+    } catch(error) {
+
+
+        console.log(error);
+
+
+        res.status(500).json({
+
+            success:false,
+
+            message:error.message
+
+        });
+
+    }
+
+};
 
 module.exports = {
 
@@ -263,6 +323,7 @@ module.exports = {
     getPlants,
     getPlant,
     deletePlant,
-    getPlantDetails
+    getPlantDetails,
+    updatePlant
 
 };

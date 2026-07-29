@@ -191,7 +191,40 @@ RETURNING *
         return result.rows[0];
 
     }
+    static async update(id, user_id, data) {
 
+
+        const result = await db.query(
+
+            `
+        UPDATE plants
+
+        SET
+            name=$1,
+            species=$2,
+            image_url=$3
+
+        WHERE id=$4
+        AND user_id=$5
+
+        RETURNING *
+
+        `,
+
+            [
+                data.name,
+                data.species,
+                data.image_url,
+                id,
+                user_id
+            ]
+
+        );
+
+
+        return result.rows[0];
+
+    }
 }
 
 

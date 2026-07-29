@@ -7,15 +7,15 @@ const authMiddleware =
 
 
 const {
+
     createPlant,
     getPlants,
     getPlant,
     deletePlant,
-    getPlantDetails
+    getPlantDetails,
+    updatePlant
 
 } = require("../controllers/plant.controller");
-
-
 
 router.post(
     "/",
