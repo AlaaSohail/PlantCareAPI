@@ -4,58 +4,85 @@ const AIAnalysis =
 const analyzePlantImage =
     require("../services/ai.service");
 
+const Plant = require("../models/plant.model");
 
-
-const analyzePlant = async (req, res) => {
+const analyzePlant = async (req,res)=>{
 
     try {
 
 
-        const image = req.file;
+        const plant =
+            await Plant.findById(
+                req.params.id,
+                req.user.id
+            );
 
 
-        if (!image) {
+        if(!plant){
 
-            return res.status(400).json({
+            return res.status(404).json({
 
-                success: false,
-                message: "Image required"
+                success:false,
+
+                message:"Plant not found"
 
             });
 
         }
 
 
-        // إنشاء رابط الصورة أولاً
+
+        if(!req.file){
+
+            return res.status(400).json({
+
+                success:false,
+
+                message:"Image required"
+
+            });
+
+        }
+
+
+
         const imageUrl =
-            `${req.protocol}://${req.get("host")}/${image.path.replace("\\", "/")}`;
+            req.file.path;
 
 
 
-        // إرسال الصورة إلى AI
+        // إرسال الصورة إلى Gemini
         const aiResult =
-            await analyzePlantImage(image.path);
+            await analyzePlantImage(
+                imageUrl
+            );
 
 
 
-        const data =
-            JSON.parse(aiResult);
+        /*
+        مثال النتيجة:
+        {
+          disease:"Leaf spot",
+          confidence:90,
+          recommendation:"..."
+        }
+        */
 
 
 
-        // حفظ النتيجة
-        const result =
+        const savedAnalysis =
             await AIAnalysis.create({
 
                 plant_id: plant.id,
 
-                image_url,
+                image_url:imageUrl,
 
-                disease: "Healthy",
+                disease:aiResult.disease,
 
-                confidence: 95,
+                confidence:aiResult.confidence,
 
-                recommendation: "Your plant looks healthy"
+                recommendation:
+                    aiResult.recommendation
 
             });
 
@@ -63,24 +90,25 @@ const analyzePlant = async (req, res) => {
 
         res.json({
 
-            success: true,
+            success:true,
 
-            analysis: result
+            analysis:savedAnalysis
 
         });
 
 
-    }
-    catch (error) {
 
-        console.log(error);
+    }
+    catch(error){
+
+        console.log("AI ERROR:",error);
 
 
         res.status(500).json({
 
-            success: false,
+            success:false,
 
-            message: "Server error"
+            message:error.message
 
         });
 
@@ -93,15 +121,36 @@ const getAnalysis = async (req, res) => {
     try {
 
 
-        const results =
-            await AIAnalysis.findByUser(
+        const plant =
+            await Plant.findById(
+                req.params.id,
                 req.user.id
+            );
+
+
+        if(!plant){
+
+            return res.status(404).json({
+
+                success:false,
+
+                message:"Plant not found"
+
+            });
+
+        }
+
+
+
+        const results =
+            await AIAnalysis.findByPlant(
+                plant.id
             );
 
 
         res.json({
 
-            success: true,
+            success:true,
 
             results
 
@@ -109,16 +158,16 @@ const getAnalysis = async (req, res) => {
 
 
     }
-    catch (error) {
+    catch(error){
 
         console.log(error);
 
 
         res.status(500).json({
 
-            success: false,
+            success:false,
 
-            message: "Server error"
+            message:error.message
 
         });
 

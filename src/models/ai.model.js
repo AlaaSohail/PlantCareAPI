@@ -6,21 +6,16 @@ class AIAnalysis {
 
     static async create(data) {
 
-
         const {
-
             plant_id,
             image_url,
             disease,
             confidence,
             recommendation
-
         } = data;
 
 
-
         const result = await db.query(
-
             `
             INSERT INTO ai_analysis
             (
@@ -35,7 +30,6 @@ class AIAnalysis {
 
             RETURNING *
             `,
-
             [
                 plant_id,
                 image_url,
@@ -43,7 +37,6 @@ class AIAnalysis {
                 confidence,
                 recommendation
             ]
-
         );
 
 
@@ -53,33 +46,42 @@ class AIAnalysis {
 
 
 
-
     static async findByPlant(plant_id) {
 
-
         const result = await db.query(
-
             `
             SELECT *
             FROM ai_analysis
-
             WHERE plant_id=$1
-
             ORDER BY created_at DESC
             `,
-
             [
                 plant_id
             ]
-
         );
 
 
         return result.rows;
 
     }
+    static async findByPlant(plant_id) {
+
+        const result = await db.query(
+            `
+        SELECT *
+        FROM ai_analysis
+        WHERE plant_id=$1
+        ORDER BY created_at DESC
+        `,
+            [
+                plant_id
+            ]
+        );
 
 
+        return result.rows;
+
+    }
 
 }
 

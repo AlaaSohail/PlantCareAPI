@@ -16,11 +16,12 @@ const analyzePlantImage = async (imagePath) => {
 
     const response = await ai.models.generateContent({
 
-        model: "gemini-2.0-flash",
+        model: "gemini-2.5-flash",
 
         contents: [
             {
                 role: "user",
+
                 parts: [
 
                     {
@@ -32,7 +33,7 @@ Return JSON only:
 {
  "plant_name":"",
  "disease":"",
- "confidence":"",
+ "confidence":0,
  "recommendation":""
 }
 `
@@ -40,8 +41,11 @@ Return JSON only:
 
                     {
                         inlineData: {
+
                             mimeType: "image/jpeg",
+
                             data: imageBase64
+
                         }
                     }
 
@@ -52,9 +56,37 @@ Return JSON only:
     });
 
 
-    return response.text;
+
+    let text = response.text;
+
+
+    // إزالة أي markdown من Gemini
+    text = text
+        .replace("```json", "")
+        .replace("```", "")
+        .trim();
+
+
+
+    const result = JSON.parse(text);
+
+
+
+    return {
+
+        plant_name: result.plant_name,
+
+        disease: result.disease,
+
+        confidence: Number(result.confidence),
+
+        recommendation: result.recommendation
+
+    };
+
 
 };
+
 
 
 module.exports = analyzePlantImage;

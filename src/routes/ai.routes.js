@@ -26,7 +26,7 @@ router.post(
 
 
 router.get(
-    "/plants/:id/history",
+    "/plants/:id/analysis",
     authMiddleware,
     getAnalysis
 );
