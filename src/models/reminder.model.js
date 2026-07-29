@@ -17,7 +17,7 @@ class Reminder {
             await db.query(
 
                 `
-INSERT INTO plant_reminders
+INSERT INTO reminders
 (
 plant_id,
 type,
@@ -52,14 +52,14 @@ RETURNING *
 
                 `
 SELECT 
-plant_reminders.*,
+reminders.*,
 plants.name
 
-FROM plant_reminders
+FROM reminders
 
 JOIN plants
 
-ON plants.id = plant_reminders.plant_id
+ON plants.id = reminders.plant_id
 
 WHERE plants.user_id=$1
 
