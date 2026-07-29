@@ -9,11 +9,12 @@ const AIAnalysis =
 const {
     deleteImage
 } = require("../services/cloudinary.service");
+
+
+
 const profile = async (req, res) => {
 
-
     try {
-
 
         const user = await User.findById(
             req.user.id
@@ -46,12 +47,9 @@ const profile = async (req, res) => {
         });
 
 
-
     } catch (error) {
 
-
         console.log(error);
-
 
         res.status(500).json({
 
@@ -60,34 +58,41 @@ const profile = async (req, res) => {
 
         });
 
-
     }
 
-
 };
+
+
+
+
 const getUsers = async (req, res) => {
 
     try {
 
+        const page =
+            parseInt(req.query.page) || 1;
 
-        const page = parseInt(req.query.page) || 1;
 
         const limit = Math.min(
             parseInt(req.query.limit) || 10,
             50
         );
 
-        const offset = (page - 1) * limit;
+
+        const offset =
+            (page - 1) * limit;
 
 
 
-        const users = await User.findAllPaginated(
-            limit,
-            offset
-        );
+        const users =
+            await User.findAllPaginated(
+                limit,
+                offset
+            );
 
 
-        const totalUsers = await User.countUsers();
+        const totalUsers =
+            await User.countUsers();
 
 
 
@@ -96,10 +101,18 @@ const getUsers = async (req, res) => {
             success: true,
 
             pagination: {
+
                 page,
+
                 limit,
+
                 totalUsers,
-                totalPages: Math.ceil(totalUsers / limit)
+
+                totalPages:
+                    Math.ceil(
+                        totalUsers / limit
+                    )
+
             },
 
             users
@@ -128,7 +141,6 @@ const getUsers = async (req, res) => {
 
 
 
-
 const updateProfile = async (req, res) => {
 
     try {
@@ -138,6 +150,7 @@ const updateProfile = async (req, res) => {
             name,
             email
         } = req.body;
+
 
 
         const user =
@@ -150,6 +163,7 @@ const updateProfile = async (req, res) => {
             );
 
 
+
         res.json({
 
             success: true,
@@ -159,7 +173,9 @@ const updateProfile = async (req, res) => {
         });
 
 
+
     } catch (error) {
+
 
         console.log(error);
 
@@ -177,8 +193,11 @@ const updateProfile = async (req, res) => {
 };
 
 
-const deleteAccount = async (req, res) => {
 
+
+
+// Delete Account
+const deleteAccount = async (req, res) => {
 
     try {
 
@@ -195,22 +214,42 @@ const deleteAccount = async (req, res) => {
             );
 
 
+        console.log(
+            "USER PLANTS:",
+            plants
+        );
+
+
 
         for (const plant of plants) {
 
 
+            console.log(
+                "Deleting plant:",
+                plant.id
+            );
+
+
+
             // حذف صورة النبتة
-            if (plant.image_public_id) {
+            if (plant.image_url) {
+
+
+                console.log(
+                    "Deleting plant image:",
+                    plant.image_url
+                );
+
 
                 await deleteImage(
-                    plant.image_public_id
+                    plant.image_url
                 );
 
             }
 
 
 
-            // جلب صور AI
+            // حذف صور AI Analysis
             const images =
                 await AIAnalysis.findImagesByPlant(
                     plant.id
@@ -220,11 +259,18 @@ const deleteAccount = async (req, res) => {
 
             for (const image of images) {
 
-                // حذف صورة النبتة
-                if (plant.image_url) {
+
+                if (image.image_url) {
+
+
+                    console.log(
+                        "Deleting AI image:",
+                        image.image_url
+                    );
+
 
                     await deleteImage(
-                        plant.image_url
+                        image.image_url
                     );
 
                 }
@@ -248,6 +294,7 @@ const deleteAccount = async (req, res) => {
 
 
         }
+
 
 
 
@@ -285,11 +332,16 @@ const deleteAccount = async (req, res) => {
 
     }
 
-
 };
+
+
+
+
+
 const changePassword = async (req, res) => {
 
     try {
+
 
         const {
             oldPassword,
@@ -297,8 +349,12 @@ const changePassword = async (req, res) => {
         } = req.body;
 
 
+
         const user =
-            await User.findById(req.user.id);
+            await User.findById(
+                req.user.id
+            );
+
 
 
         if (!user) {
@@ -306,11 +362,14 @@ const changePassword = async (req, res) => {
             return res.status(404).json({
 
                 success: false,
+
                 message: "User not found"
 
             });
 
         }
+
+
 
         if (!oldPassword || !newPassword) {
 
@@ -318,24 +377,14 @@ const changePassword = async (req, res) => {
 
                 success: false,
 
-                message: "Old password and new password are required"
+                message:
+                    "Old password and new password are required"
 
             });
 
         }
 
 
-        if (!user.password) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message: "Password not found"
-
-            });
-
-        }
 
         const isMatch =
             await bcrypt.compare(
@@ -344,16 +393,20 @@ const changePassword = async (req, res) => {
             );
 
 
+
         if (!isMatch) {
 
             return res.status(400).json({
 
                 success: false,
-                message: "Old password incorrect"
+
+                message:
+                    "Old password incorrect"
 
             });
 
         }
+
 
 
         const hashedPassword =
@@ -361,6 +414,7 @@ const changePassword = async (req, res) => {
                 newPassword,
                 10
             );
+
 
 
         await User.updatePassword(
@@ -372,6 +426,7 @@ const changePassword = async (req, res) => {
         );
 
 
+
         res.json({
 
             success: true,
@@ -379,6 +434,7 @@ const changePassword = async (req, res) => {
             message: "Password updated"
 
         });
+
 
 
     } catch (error) {
@@ -399,10 +455,20 @@ const changePassword = async (req, res) => {
 
 };
 
+
+
+
+
 module.exports = {
+
     profile,
+
     getUsers,
+
     updateProfile,
+
     deleteAccount,
+
     changePassword
+
 };
