@@ -7,9 +7,9 @@ const transporter = nodemailer.createTransport({
 
     port: 587,
 
-    secure: false, // مهم: لا تستخدم 465
+    secure: false,
 
-    family: 4, // IPv4
+    family: 4,
 
     auth: {
 
@@ -26,9 +26,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-
 const sendResetEmail = async (email, token) => {
-
 
     const resetUrl =
         `https://plantcare.app/reset-password?token=${token}`;
@@ -43,15 +41,13 @@ const sendResetEmail = async (email, token) => {
         subject: "PlantCare Password Reset",
 
         html: `
+            <h2>PlantCare</h2>
 
-        <h2>PlantCare</h2>
+            <p>You requested a password reset.</p>
 
-        <p>Reset your password:</p>
-
-        <a href="${resetUrl}">
-            Reset Password
-        </a>
-
+            <a href="${resetUrl}">
+                Reset Password
+            </a>
         `
 
     });
