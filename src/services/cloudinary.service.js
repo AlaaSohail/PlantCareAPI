@@ -8,20 +8,42 @@ const deleteImage = async (imageUrl) => {
         if (!imageUrl) return;
 
 
-        const parts = imageUrl.split("/");
+        let publicId;
 
 
-        const fileName =
-            parts[parts.length - 1];
+        if (imageUrl.startsWith("http")) {
 
 
-        const publicId =
-            "plantcare/" + fileName.split(".")[0];
+            const urlParts =
+                imageUrl.split("/");
 
 
-        console.log("IMAGE URL:", imageUrl);
+            const uploadIndex =
+                urlParts.indexOf("upload");
 
-        console.log("PUBLIC ID:", publicId);
+
+            const pathAfterUpload =
+                urlParts.slice(uploadIndex + 2)
+                    .join("/");
+
+
+            publicId =
+                pathAfterUpload
+                    .replace(/\.[^/.]+$/, "");
+
+
+        } else {
+
+            publicId = imageUrl;
+
+        }
+
+
+
+        console.log(
+            "Deleting public_id:",
+            publicId
+        );
 
 
 
@@ -32,12 +54,12 @@ const deleteImage = async (imageUrl) => {
 
 
         console.log(
-            "CLOUDINARY RESULT:",
+            "Cloudinary result:",
             result
         );
 
 
-    } catch(error) {
+    } catch (error) {
 
         console.log(
             "Cloudinary delete error:",

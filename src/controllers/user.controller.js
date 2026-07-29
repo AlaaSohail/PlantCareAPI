@@ -220,10 +220,11 @@ const deleteAccount = async (req, res) => {
 
             for (const image of images) {
 
-                if (image.image_url) {
+                // حذف صورة النبتة
+                if (plant.image_url) {
 
                     await deleteImage(
-                        image.image_url
+                        plant.image_url
                     );
 
                 }
