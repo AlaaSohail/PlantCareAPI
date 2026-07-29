@@ -2,17 +2,16 @@ const express = require("express");
 
 const router = express.Router();
 
-
 const authMiddleware =
     require("../middleware/auth.middleware");
 
 
 const {
-
     createPlant,
     getPlants,
     getPlant,
-    deletePlant
+    deletePlant,
+    getPlantDetails
 
 } = require("../controllers/plant.controller");
 
@@ -25,13 +24,11 @@ router.post(
 );
 
 
-
 router.get(
     "/",
     authMiddleware,
     getPlants
 );
-
 
 
 router.get(
@@ -54,11 +51,5 @@ router.delete(
     deletePlant
 );
 
-const {
-    getPlantDetails
-} = require("../controllers/plant.controller");
-
-
-router.get("/:id", getPlantDetails);
 
 module.exports = router;
