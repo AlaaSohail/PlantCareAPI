@@ -94,11 +94,21 @@ Rules:
 
 
 
-    const result =
-        JSON.parse(
+    let result;
+
+    try {
+
+        result = JSON.parse(
             response.output_text
         );
 
+    } catch (error) {
+
+        throw new Error(
+            "AI returned invalid response"
+        );
+
+    }
 
 
     return result;

@@ -169,18 +169,72 @@ const getPlant = async (req, res) => {
 
 const deletePlant = async (req, res) => {
 
-
     try {
+
+        const AIAnalysis =
+            require("../models/ai.model");
+
+
+        const {
+            deleteImage
+        } = require("../services/cloudinary.service");
+
 
 
         const plant =
-            await Plant.delete(
-
+            await Plant.findById(
                 req.params.id,
-
                 req.user.id
-
             );
+
+
+        if (!plant) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Plant not found"
+
+            });
+
+        }
+
+
+
+        // حذف صورة النبتة الأساسية
+        if (plant.image_url) {
+
+            await deleteImage(
+                plant.image_url
+            );
+
+        }
+
+
+
+        // حذف صور تحليلات AI
+        const images =
+            await AIAnalysis.deleteByPlant(
+                plant.id
+            );
+
+
+        for (const image of images) {
+
+            await deleteImage(
+                image.image_url
+            );
+
+        }
+
+
+
+        // حذف النبتة
+        await Plant.delete(
+            plant.id,
+            req.user.id
+        );
 
 
 
@@ -188,7 +242,7 @@ const deletePlant = async (req, res) => {
 
             success: true,
 
-            message: "Plant deleted"
+            message: "Plant deleted successfully"
 
         });
 
@@ -197,15 +251,16 @@ const deletePlant = async (req, res) => {
 
         console.log(error);
 
+
         res.status(500).json({
 
             success: false,
-            message: "Server error"
+
+            message: error.message
 
         });
 
     }
-
 
 };
 
@@ -282,8 +337,8 @@ const updatePlant = async (req, res) => {
 
             return res.status(404).json({
 
-                success:false,
-                message:"Plant not found"
+                success: false,
+                message: "Plant not found"
 
             });
 
@@ -292,14 +347,14 @@ const updatePlant = async (req, res) => {
 
         res.json({
 
-            success:true,
+            success: true,
 
             plant
 
         });
 
 
-    } catch(error) {
+    } catch (error) {
 
 
         console.log(error);
@@ -307,9 +362,9 @@ const updatePlant = async (req, res) => {
 
         res.status(500).json({
 
-            success:false,
+            success: false,
 
-            message:error.message
+            message: error.message
 
         });
 

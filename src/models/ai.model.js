@@ -102,6 +102,49 @@ RETURNING *
         return result.rows;
 
     }
+
+    static async findImagesByPlant(plant_id) {
+
+        const result = await db.query(
+
+            `
+SELECT image_url
+FROM ai_analysis
+WHERE plant_id=$1
+AND image_url IS NOT NULL
+`,
+            [
+                plant_id
+            ]
+
+        );
+
+        return result.rows;
+
+    }
+
+
+
+    static async deleteByPlant(plant_id) {
+
+        const result = await db.query(
+
+            `
+DELETE FROM ai_analysis
+WHERE plant_id=$1
+RETURNING image_url
+`,
+
+            [
+                plant_id
+            ]
+
+        );
+
+
+        return result.rows;
+
+    }
 }
 
 
