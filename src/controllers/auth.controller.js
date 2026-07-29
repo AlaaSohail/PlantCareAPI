@@ -4,87 +4,114 @@ const User = require("../models/user.model");
 const Token = require("../models/token.model");
 
 
+// const register = async (req, res) => {
+
+//     try {
+
+//         const { name, email, password } = req.body || {};;
+
+
+//         // التحقق من البيانات
+//         if (!name || !email || !password) {
+
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "All fields are required"
+//             });
+
+//         }
+
+
+//         // هل المستخدم موجود؟
+//         const existingUser = await User.findByEmail(email);
+
+
+//         if (existingUser) {
+
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "Email already exists"
+//             });
+
+//         }
+
+
+//         // تشفير كلمة المرور
+//         const hashedPassword =
+//             await bcrypt.hash(password, 10);
+
+
+
+//         // إنشاء المستخدم
+//         const user = await User.create({
+
+//             name,
+//             email,
+//             password: hashedPassword
+
+//         });
+
+
+
+//         res.status(201).json({
+
+//             success: true,
+//             message: "User created successfully",
+
+//             user: {
+//                 id: user.id,
+//                 name: user.name,
+//                 email: user.email
+//             }
+
+//         });
+
+
+
+//     } catch (error) {
+
+//         console.log("REGISTER ERROR:", error);
+
+//         res.status(500).json({
+
+//             success: false,
+//             message: error.message
+
+//         });
+
+//     }
+
+// };
+
+
 const register = async (req, res) => {
 
     try {
 
-        const { name, email, password } = req.body || {};;
+        console.log("REGISTER BODY:", req.body);
 
+        const { name, email, password } = req.body;
 
-        // التحقق من البيانات
-        if (!name || !email || !password) {
+        console.log("CHECKING USER");
 
-            return res.status(400).json({
-                success: false,
-                message: "All fields are required"
-            });
-
-        }
-
-
-        // هل المستخدم موجود؟
         const existingUser = await User.findByEmail(email);
 
+        console.log("USER RESULT:", existingUser);
 
-        if (existingUser) {
-
-            return res.status(400).json({
-                success: false,
-                message: "Email already exists"
-            });
-
-        }
-
-
-        // تشفير كلمة المرور
-        const hashedPassword =
-            await bcrypt.hash(password, 10);
-
-
-
-        // إنشاء المستخدم
-        const user = await User.create({
-
-            name,
-            email,
-            password: hashedPassword
-
-        });
-
-
-
-        res.status(201).json({
-
-            success: true,
-            message: "User created successfully",
-
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email
-            }
-
-        });
-
-
+        // باقي الكود...
 
     } catch (error) {
 
-        console.log(error);
+        console.log("REGISTER ERROR:", error);
 
         res.status(500).json({
-
-            success: false,
-            message: "Server error"
-
+            success:false,
+            message:error.message
         });
 
     }
 
 };
-
-
-
 
 const login = async (req, res) => {
 
