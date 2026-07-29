@@ -6,7 +6,7 @@ const analyzePlantImage =
 
 const Plant = require("../models/plant.model");
 
-const analyzePlant = async (req,res)=>{
+const analyzePlant = async (req, res) => {
 
     try {
 
@@ -18,13 +18,13 @@ const analyzePlant = async (req,res)=>{
             );
 
 
-        if(!plant){
+        if (!plant) {
 
             return res.status(404).json({
 
-                success:false,
+                success: false,
 
-                message:"Plant not found"
+                message: "Plant not found"
 
             });
 
@@ -32,13 +32,13 @@ const analyzePlant = async (req,res)=>{
 
 
 
-        if(!req.file){
+        if (!req.file) {
 
             return res.status(400).json({
 
-                success:false,
+                success: false,
 
-                message:"Image required"
+                message: "Image required"
 
             });
 
@@ -75,14 +75,23 @@ const analyzePlant = async (req,res)=>{
 
                 plant_id: plant.id,
 
-                image_url:imageUrl,
+                image_url: imageUrl,
 
-                disease:aiResult.disease,
+                disease: aiResult.disease,
 
-                confidence:aiResult.confidence,
+                confidence: aiResult.confidence,
 
                 recommendation:
-                    aiResult.recommendation
+                    aiResult.recommendation,
+                plant_name: aiResult.plant_name,
+
+                health_status: aiResult.health_status,
+
+                watering_advice: aiResult.watering_advice,
+
+                sunlight_advice: aiResult.sunlight_advice,
+
+                fertilizer_advice: aiResult.fertilizer_advice,
 
             });
 
@@ -90,25 +99,25 @@ const analyzePlant = async (req,res)=>{
 
         res.json({
 
-            success:true,
+            success: true,
 
-            analysis:savedAnalysis
+            analysis: savedAnalysis
 
         });
 
 
 
     }
-    catch(error){
+    catch (error) {
 
-        console.log("AI ERROR:",error);
+        console.log("AI ERROR:", error);
 
 
         res.status(500).json({
 
-            success:false,
+            success: false,
 
-            message:error.message
+            message: error.message
 
         });
 
@@ -128,13 +137,13 @@ const getAnalysis = async (req, res) => {
             );
 
 
-        if(!plant){
+        if (!plant) {
 
             return res.status(404).json({
 
-                success:false,
+                success: false,
 
-                message:"Plant not found"
+                message: "Plant not found"
 
             });
 
@@ -150,7 +159,7 @@ const getAnalysis = async (req, res) => {
 
         res.json({
 
-            success:true,
+            success: true,
 
             results
 
@@ -158,16 +167,16 @@ const getAnalysis = async (req, res) => {
 
 
     }
-    catch(error){
+    catch (error) {
 
         console.log(error);
 
 
         res.status(500).json({
 
-            success:false,
+            success: false,
 
-            message:error.message
+            message: error.message
 
         });
 

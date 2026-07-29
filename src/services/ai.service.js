@@ -15,7 +15,7 @@ const analyzePlantImage = async (imagePath) => {
 
     const imageBase64 =
         fs.readFileSync(imagePath)
-        .toString("base64");
+            .toString("base64");
 
 
 
@@ -35,21 +35,34 @@ const analyzePlantImage = async (imagePath) => {
                             type: "input_text",
 
                             text: `
-Analyze this plant image.
+You are an expert botanist and plant doctor.
+
+Analyze this plant image carefully.
 
 Return ONLY valid JSON.
+Do not use markdown.
+Do not add any text outside JSON.
 
-Format:
+Use this exact format:
 
 {
- "plant_name":"",
- "disease":"",
- "confidence":0,
- "recommendation":""
+  "plant_name": "",
+  "health_status": "",
+  "disease": "",
+  "confidence": 0.0,
+  "recommendation": "",
+  "watering_advice": "",
+  "sunlight_advice": "",
+  "fertilizer_advice": ""
 }
 
-Do not add markdown.
-Do not add explanations.
+Rules:
+- Identify the plant name if possible.
+- Determine if the plant is healthy or unhealthy.
+- Mention visible diseases or problems.
+- If there is no disease, use "None detected".
+- confidence must be a number between 0 and 1.
+- Give simple practical advice.
 `
                         },
 
@@ -58,7 +71,7 @@ Do not add explanations.
                             type: "input_image",
 
                             image_url:
-                            `data:image/jpeg;base64,${imageBase64}`
+                                `data:image/jpeg;base64,${imageBase64}`
 
                         }
 
@@ -81,12 +94,21 @@ Do not add explanations.
 
     return {
 
+        plant_name: result.plant_name,
+
+        health_status: result.health_status,
+
         disease: result.disease,
 
         confidence: result.confidence,
 
-        recommendation:
-            result.recommendation
+        recommendation: result.recommendation,
+
+        watering_advice: result.watering_advice,
+
+        sunlight_advice: result.sunlight_advice,
+
+        fertilizer_advice: result.fertilizer_advice
 
     };
 
