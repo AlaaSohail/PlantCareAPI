@@ -19,14 +19,21 @@ const deleteImage = async (imageUrl) => {
             "plantcare/" + fileName.split(".")[0];
 
 
-        await cloudinary.uploader.destroy(
-            publicId
-        );
+        console.log("IMAGE URL:", imageUrl);
+
+        console.log("PUBLIC ID:", publicId);
+
+
+
+        const result =
+            await cloudinary.uploader.destroy(
+                publicId
+            );
 
 
         console.log(
-            "Deleted from Cloudinary:",
-            publicId
+            "CLOUDINARY RESULT:",
+            result
         );
 
 

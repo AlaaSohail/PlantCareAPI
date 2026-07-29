@@ -18,18 +18,19 @@ const createPlant = async (req, res) => {
 
 
 
-        const plant =
-            await Plant.create({
+        const plant = await Plant.create({
 
-                user_id: req.user.id,
+            user_id: req.user.id,
 
-                name,
+            name,
 
-                species,
+            species,
 
-                image_url
+            image_url: req.file.path,
 
-            });
+            image_public_id: req.file.filename
+
+        });
 
 
 
