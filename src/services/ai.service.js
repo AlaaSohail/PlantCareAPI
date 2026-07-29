@@ -6,7 +6,6 @@ const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY
 });
 
-testModels();
 
 const analyzePlantImage = async (imagePath) => {
 
