@@ -5,7 +5,21 @@ const fs = require("fs");
 const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY
 });
+const testModels = async () => {
 
+    const models = await ai.models.list();
+
+
+    for await (const model of models) {
+
+        console.log(model.name);
+
+    }
+
+};
+
+
+testModels();
 
 const analyzePlantImage = async (imagePath) => {
 
@@ -16,7 +30,7 @@ const analyzePlantImage = async (imagePath) => {
 
     const response = await ai.models.generateContent({
 
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
 
         contents: [
             {
@@ -56,7 +70,7 @@ Return JSON only:
     });
 
 
-
+    console.log(response.text);
     let text = response.text;
 
 
