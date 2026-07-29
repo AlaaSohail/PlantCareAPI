@@ -3,7 +3,7 @@ console.log("DATABASE_URL:", process.env.DATABASE_URL);
 const app = require("./src/app");
 
 const db = require("./src/config/database");
-
+require("./src/jobs/tokenCleanup.job");
 const helmet = require("helmet");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");

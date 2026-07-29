@@ -12,12 +12,24 @@ const {
     getUsers
 } = require("../controllers/user.controller");
 
+router.put(
+    "/profile",
+    authMiddleware,
+    updateProfile
+);
+
+router.put(
+ "/password",
+ authMiddleware,
+ changePassword
+);
 
 router.get(
     "/all",
     authMiddleware,
     adminMiddleware,
     getUsers
+
 );
 
 

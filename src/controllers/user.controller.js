@@ -1,6 +1,5 @@
 const User = require("../models/user.model");
-
-
+const bcrypt = require("bcrypt");
 const profile = async (req, res) => {
 
 
@@ -116,7 +115,99 @@ const getUsers = async (req, res) => {
 
 };
 
+
+
+
+
+
+const updateProfile = async (req, res) => {
+
+    try {
+
+
+        const {
+            name,
+            email
+        } = req.body;
+
+
+        const user =
+            await User.updateProfile(
+                req.user.id,
+                {
+                    name,
+                    email
+                }
+            );
+
+
+        res.json({
+
+            success: true,
+
+            user
+
+        });
+
+
+    } catch (error) {
+
+        console.log(error);
+
+
+        res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
+
+};
+
+
+const deleteAccount = async(req,res)=>{
+
+
+    try{
+
+
+        await User.delete(
+            req.user.id
+        );
+
+
+        res.json({
+
+            success:true,
+
+            message:"Account deleted"
+
+        });
+
+
+    }catch(error){
+
+
+        res.status(500).json({
+
+            success:false,
+
+            message:error.message
+
+        });
+
+    }
+
+
+};
+
+
 module.exports = {
     profile,
-    getUsers
+    getUsers,
+    updateProfile,
+    deleteAccount
 };

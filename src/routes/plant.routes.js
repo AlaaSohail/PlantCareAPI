@@ -51,5 +51,9 @@ router.delete(
     deletePlant
 );
 
-
+router.put(
+ "/:id",
+ authMiddleware,
+ updatePlant
+);
 module.exports = router;

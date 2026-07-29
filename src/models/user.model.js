@@ -175,19 +175,73 @@ WHERE email=$1
         return result.rows;
 
     }
-    static async countUsers(){
+    static async countUsers() {
 
-    const result = await db.query(
-        `
+        const result = await db.query(
+            `
         SELECT COUNT(*) 
         FROM users
         `
-    );
+        );
 
 
-    return parseInt(result.rows[0].count);
+        return parseInt(result.rows[0].count);
 
-}
+    }
+
+
+    static async updateProfile(id, data) {
+
+
+        const result = await db.query(
+
+            `
+        UPDATE users
+
+        SET
+        name=$1,
+        email=$2
+
+        WHERE id=$3
+
+        RETURNING
+        id,
+        name,
+        email,
+        role,
+        created_at
+        `,
+
+            [
+                data.name,
+                data.email,
+                id
+            ]
+
+        );
+
+
+        return result.rows[0];
+
+    }
+    
+    static async delete(id) {
+
+
+        await db.query(
+
+            `
+        DELETE FROM users
+        WHERE id=$1
+        `,
+
+            [id]
+
+        );
+
+
+    }
+
 }
 
 
