@@ -38,6 +38,21 @@ const authMiddleware = async (req, res, next) => {
 
         const token = parts[1];
 
+        console.log("TOKEN RECEIVED:", token);
+
+        console.log(
+            "JWT SECRET:",
+            process.env.JWT_SECRET
+        );
+
+
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
+
+        console.log("DECODED:", decoded);
+
 
         // فحص هل تم تسجيل الخروج بهذا الـ Token
         const blacklisted = await Token.isBlacklisted(token);
@@ -74,14 +89,12 @@ const authMiddleware = async (req, res, next) => {
 
     } catch (error) {
 
+        console.log("JWT ERROR:", error);
 
         return res.status(401).json({
-
             success: false,
             message: "Invalid token"
-
         });
-
 
     }
 
