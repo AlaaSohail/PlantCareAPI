@@ -9,6 +9,8 @@ const transporter = nodemailer.createTransport({
 
     secure: false, // مهم: لا تستخدم 465
 
+    family: 4, // IPv4
+
     auth: {
 
         user: process.env.EMAIL_USER,

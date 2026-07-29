@@ -5,19 +5,6 @@ const fs = require("fs");
 const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY
 });
-const testModels = async () => {
-
-    const models = await ai.models.list();
-
-
-    for await (const model of models) {
-
-        console.log(model.name);
-
-    }
-
-};
-
 
 testModels();
 
