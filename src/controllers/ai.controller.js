@@ -47,17 +47,15 @@ const analyzePlant = async (req, res) => {
         const result =
             await AIAnalysis.create({
 
-                user_id: req.user.id,
+                plant_id: plant.id,
 
-                plant_id: req.body.plant_id || null,
+                image_url,
 
-                image_url: imageUrl,
+                disease: "Healthy",
 
-                disease: data.disease,
+                confidence: 95,
 
-                confidence: data.confidence,
-
-                recommendation: data.recommendation
+                recommendation: "Your plant looks healthy"
 
             });
 

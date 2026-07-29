@@ -9,94 +9,79 @@ class AIAnalysis {
 
         const {
 
-            user_id,
-
             plant_id,
-
             image_url,
-
             disease,
-
             confidence,
-
             recommendation
 
         } = data;
 
 
 
-        const result =
-            await db.query(
+        const result = await db.query(
 
-                `
-INSERT INTO ai_analysis
+            `
+            INSERT INTO ai_analysis
+            (
+                plant_id,
+                image_url,
+                disease,
+                confidence,
+                recommendation
+            )
 
-(
-user_id,
-plant_id,
-image_url,
-disease,
-confidence,
-recommendation
-)
+            VALUES($1,$2,$3,$4,$5)
 
-VALUES($1,$2,$3,$4,$5,$6)
+            RETURNING *
+            `,
 
-RETURNING *
+            [
+                plant_id,
+                image_url,
+                disease,
+                confidence,
+                recommendation
+            ]
 
-`,
-
-                [
-                    user_id,
-                    plant_id,
-                    image_url,
-                    disease,
-                    confidence,
-                    recommendation
-                ]
-
-            );
-
+        );
 
 
         return result.rows[0];
-
 
     }
 
 
 
 
-    static async findByUser(user_id) {
+    static async findByPlant(plant_id) {
 
 
-        const result =
-            await db.query(
+        const result = await db.query(
 
-                `
-SELECT *
-FROM ai_analysis
+            `
+            SELECT *
+            FROM ai_analysis
 
-WHERE user_id=$1
+            WHERE plant_id=$1
 
-ORDER BY created_at DESC
+            ORDER BY created_at DESC
+            `,
 
-`,
+            [
+                plant_id
+            ]
 
-                [user_id]
-
-            );
+        );
 
 
         return result.rows;
-
 
     }
 
 
 
 }
-
 
 
 module.exports = AIAnalysis;
