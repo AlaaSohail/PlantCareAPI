@@ -35,16 +35,16 @@ const register = async (req, res) => {
 
         }
 
-
+        console.log("USER RESULT:", existingUser);
         // تشفير كلمة المرور
-        console.log("BEFORE HASH");
+        console.log("START HASH");
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        console.log("AFTER HASH");
+        console.log("HASH DONE");
 
 
-        console.log("BEFORE CREATE");
+        console.log("START CREATE");
 
         const user = await User.create({
             name,
@@ -52,7 +52,7 @@ const register = async (req, res) => {
             password: hashedPassword
         });
 
-        console.log("AFTER CREATE");
+        console.log("CREATE DONE");
 
         res.status(201).json({
 
