@@ -1,5 +1,4 @@
 require("dotenv").config();
-console.log("DATABASE_URL:", process.env.DATABASE_URL);
 const app = require("./src/app");
 
 const db = require("./src/config/database");
@@ -31,6 +30,7 @@ app.use(cors({
     credentials: true
 
 }));
+
 
 
 const limiter = rateLimit({

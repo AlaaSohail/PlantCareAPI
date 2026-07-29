@@ -1,33 +1,45 @@
-const { GoogleGenAI } = require("@google/genai");
+const OpenAI = require("openai");
 const fs = require("fs");
 
 
-const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY
+const client = new OpenAI({
+
+    apiKey: process.env.OPENAI_API_KEY
+
 });
+
 
 
 const analyzePlantImage = async (imagePath) => {
 
-    const imageBase64 = fs
-        .readFileSync(imagePath)
+
+    const imageBase64 =
+        fs.readFileSync(imagePath)
         .toString("base64");
 
 
-    const response = await ai.models.generateContent({
 
-        model: "gemini-2.0-flash-001",
-        contents: [
-            {
-                role: "user",
+    const response =
+        await client.responses.create({
 
-                parts: [
+            model: "gpt-4.1-mini",
 
-                    {
-                        text: `
+            input: [
+
+                {
+                    role: "user",
+
+                    content: [
+
+                        {
+                            type: "input_text",
+
+                            text: `
 Analyze this plant image.
 
-Return JSON only:
+Return ONLY valid JSON.
+
+Format:
 
 {
  "plant_name":"",
@@ -35,51 +47,46 @@ Return JSON only:
  "confidence":0,
  "recommendation":""
 }
+
+Do not add markdown.
+Do not add explanations.
 `
-                    },
+                        },
 
-                    {
-                        inlineData: {
 
-                            mimeType: "image/jpeg",
+                        {
+                            type: "input_image",
 
-                            data: imageBase64
+                            image_url:
+                            `data:image/jpeg;base64,${imageBase64}`
 
                         }
-                    }
 
-                ]
-            }
-        ]
+                    ]
 
-    });
+                }
 
+            ]
 
-    console.log(response.text);
-    let text = response.text;
-
-
-    // إزالة أي markdown من Gemini
-    text = text
-        .replace("```json", "")
-        .replace("```", "")
-        .trim();
+        });
 
 
 
-    const result = JSON.parse(text);
+    const result =
+        JSON.parse(
+            response.output_text
+        );
 
 
 
     return {
 
-        plant_name: result.plant_name,
-
         disease: result.disease,
 
-        confidence: Number(result.confidence),
+        confidence: result.confidence,
 
-        recommendation: result.recommendation
+        recommendation:
+            result.recommendation
 
     };
 
