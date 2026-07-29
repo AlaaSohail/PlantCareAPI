@@ -3,7 +3,11 @@ const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
 
-    service: "gmail",
+    host: "smtp.gmail.com",
+
+    port: 587,
+
+    secure: false, // مهم: لا تستخدم 465
 
     auth: {
 
@@ -11,6 +15,10 @@ const transporter = nodemailer.createTransport({
 
         pass: process.env.EMAIL_PASSWORD
 
+    },
+
+    tls: {
+        rejectUnauthorized: false
     }
 
 });
@@ -34,28 +42,17 @@ const sendResetEmail = async (email, token) => {
 
         html: `
 
-        <div style="font-family:Arial">
+        <h2>PlantCare</h2>
 
-            <h2>PlantCare</h2>
+        <p>Reset your password:</p>
 
-            <p>
-            You requested to reset your password.
-            </p>
-
-            <a href="${resetUrl}">
-                Reset Password
-            </a>
-
-            <p>
-            This link expires after 15 minutes.
-            </p>
-
-        </div>
+        <a href="${resetUrl}">
+            Reset Password
+        </a>
 
         `
 
     });
-
 
 };
 
