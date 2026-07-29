@@ -2,8 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const Token = require("../models/token.model");
-const sendEmail = require("../services/email.service");
-
+const sendResetEmail =
+    require("../services/email.service");
 const register = async (req, res) => {
 
     try {
@@ -251,10 +251,14 @@ const forgotPassword = async (req, res) => {
             token,
             expire
         );
-        await sendEmail(
-            user.email,
+        console.log("BEFORE SEND EMAIL");
+
+        await sendResetEmail(
+            email,
             token
         );
+
+        console.log("AFTER SEND EMAIL");
         res.json({
             success: true,
             message: "Reset token created",
