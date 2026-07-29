@@ -203,11 +203,98 @@ const deleteAccount = async(req,res)=>{
 
 
 };
+const changePassword = async (req, res) => {
 
+    try {
+
+        const {
+            oldPassword,
+            newPassword
+        } = req.body;
+
+
+        const user =
+            await User.findById(req.user.id);
+
+
+        if (!user) {
+
+            return res.status(404).json({
+
+                success:false,
+                message:"User not found"
+
+            });
+
+        }
+
+
+        const isMatch =
+            await bcrypt.compare(
+                oldPassword,
+                user.password
+            );
+
+
+        if (!isMatch) {
+
+            return res.status(400).json({
+
+                success:false,
+                message:"Old password incorrect"
+
+            });
+
+        }
+
+
+        const hashedPassword =
+            await bcrypt.hash(
+                newPassword,
+                10
+            );
+
+
+        await User.updatePassword(
+
+            req.user.id,
+
+            hashedPassword
+
+        );
+
+
+        res.json({
+
+            success:true,
+
+            message:"Password updated"
+
+        });
+
+
+    } catch(error) {
+
+
+        console.log(error);
+
+
+        res.status(500).json({
+
+            success:false,
+
+            message:error.message
+
+        });
+
+    }
+
+};
 
 module.exports = {
     profile,
     getUsers,
     updateProfile,
-    deleteAccount
+    deleteAccount,
+    changePassword
 };
