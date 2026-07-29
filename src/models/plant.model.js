@@ -116,51 +116,46 @@ class Plant {
 
     }
 
-    getDetails = async (id) => {
+   static async getDetails(id) {
+
+    const result = await db.query(
+
+        `
+        SELECT 
+            p.id,
+            p.user_id,
+            p.name,
+            p.species,
+            p.image_url,
+            p.created_at,
+
+            (
+                SELECT json_agg(r)
+                FROM reminders r
+                WHERE r.plant_id = p.id
+            ) AS reminders,
+
+            (
+                SELECT row_to_json(a)
+                FROM ai_analysis a
+                WHERE a.plant_id = p.id
+                ORDER BY a.created_at DESC
+                LIMIT 1
+            ) AS latest_analysis
+
+        FROM plants p
+
+        WHERE p.id=$1
+        `,
+
+        [id]
+
+    );
 
 
-        const result = await db.query(
+    return result.rows[0];
 
-            `
-SELECT 
-    p.id,
-    p.user_id,
-    p.name,
-    p.species,
-    p.image_url,
-    p.created_at,
-
-
-    (
-        SELECT json_agg(r)
-        FROM reminders r
-        WHERE r.plant_id = p.id
-    ) AS reminders,
-
-
-    (
-        SELECT row_to_json(a)
-        FROM ai_analysis a
-        WHERE a.plant_id = p.id
-        ORDER BY a.created_at DESC
-        LIMIT 1
-    ) AS latest_analysis
-
-
-FROM plants p
-
-WHERE p.id=$1
-
-`,
-            [id]
-
-        );
-
-
-        return result.rows[0];
-
-
-    };
+}
 
 
 }
