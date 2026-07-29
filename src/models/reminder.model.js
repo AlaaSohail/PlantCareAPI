@@ -9,39 +9,40 @@ class Reminder {
         const {
             plant_id,
             type,
+            title,
+            description,
             reminder_date
         } = data;
 
 
-        const result =
-            await db.query(
+        const result = await db.query(
+            `
+        INSERT INTO reminders
+        (
+            plant_id,
+            type,
+            title,
+            description,
+            reminder_date
+        )
 
-                `
-INSERT INTO reminders
-(
-plant_id,
-type,
-reminder_date
-)
+        VALUES($1,$2,$3,$4,$5)
 
-VALUES($1,$2,$3)
-
-RETURNING *
-`,
-
-                [
-                    plant_id,
-                    type,
-                    reminder_date
-                ]
-
-            );
+        RETURNING *
+        `,
+            [
+                plant_id,
+                type,
+                title,
+                description,
+                reminder_date
+            ]
+        );
 
 
         return result.rows[0];
 
     }
-
 
 
     static async findByUser(user_id) {

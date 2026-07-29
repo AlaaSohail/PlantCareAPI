@@ -32,32 +32,29 @@ const createReminder = async (req, res) => {
 
         const {
             type,
+            title,
+            description,
             reminder_date
         } = req.body || {};
 
-        if (!type || !reminder_date) {
+        if (!type || !title || !reminder_date) {
 
             return res.status(400).json({
-
                 success: false,
-                message: "Type and reminder date are required"
-
+                message: "Type, title and reminder date are required"
             });
 
         }
 
-        const reminder =
-            await Reminder.create({
+        const reminder = await Reminder.create({
 
-                plant_id: plant.id,
+            plant_id: plant.id,
+            type,
+            title,
+            description,
+            reminder_date
 
-                type,
-
-                reminder_date
-
-            });
-
-
+        });
 
         res.json({
 
