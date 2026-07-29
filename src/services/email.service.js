@@ -20,26 +20,23 @@ const sendResetEmail = async (
 
     await resend.emails.send({
 
-        from: "PlantCare <onboarding@resend.dev>",
+        from: "PlantCare <noreply@alaasohail.com>",
 
         to: email,
 
         subject: "Reset your PlantCare password",
 
         html: `
-
         <h2>PlantCare</h2>
 
         <p>
-        You requested a password reset.
+        Click below to reset your password:
         </p>
 
-
-        <a href="${resetUrl}">
+        <a href="${resetLink}">
             Reset Password
         </a>
-
-        `
+    `
 
     });
 
