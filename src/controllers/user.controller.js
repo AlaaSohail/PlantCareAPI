@@ -1,5 +1,14 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
+const Plant = require("../models/plant.model");
+
+const AIAnalysis =
+    require("../models/ai.model");
+
+
+const {
+    deleteImage
+} = require("../services/cloudinary.service");
 const profile = async (req, res) => {
 
 
@@ -174,21 +183,95 @@ const deleteAccount = async (req, res) => {
     try {
 
 
+        const userId =
+            req.user.id;
+
+
+
+        // جلب نباتات المستخدم
+        const plants =
+            await Plant.findByUser(
+                userId
+            );
+
+
+
+        for (const plant of plants) {
+
+
+            // حذف صورة النبتة
+            if (plant.image_public_id) {
+
+                await deleteImage(
+                    plant.image_public_id
+                );
+
+            }
+
+
+
+            // جلب صور AI
+            const images =
+                await AIAnalysis.findImagesByPlant(
+                    plant.id
+                );
+
+
+
+            for (const image of images) {
+
+                if (image.image_url) {
+
+                    await deleteImage(
+                        image.image_url
+                    );
+
+                }
+
+            }
+
+
+
+            // حذف تحليلات AI
+            await AIAnalysis.deleteByPlant(
+                plant.id
+            );
+
+
+
+            // حذف النبتة
+            await Plant.delete(
+                plant.id,
+                userId
+            );
+
+
+        }
+
+
+
+        // حذف المستخدم
         await User.delete(
-            req.user.id
+            userId
         );
+
 
 
         res.json({
 
             success: true,
 
-            message: "Account deleted"
+            message:
+                "Account and all data deleted successfully"
 
         });
 
 
+
     } catch (error) {
+
+
+        console.log(error);
 
 
         res.status(500).json({

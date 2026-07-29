@@ -225,6 +225,25 @@ RETURNING *
         return result.rows[0];
 
     }
+    static async findByUser(user_id) {
+
+        const result = await db.query(
+
+            `
+SELECT *
+FROM plants
+WHERE user_id=$1
+`,
+
+            [
+                user_id
+            ]
+
+        );
+
+        return result.rows;
+
+    }
 }
 
 
