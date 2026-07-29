@@ -168,10 +168,10 @@ const updateProfile = async (req, res) => {
 };
 
 
-const deleteAccount = async(req,res)=>{
+const deleteAccount = async (req, res) => {
 
 
-    try{
+    try {
 
 
         await User.delete(
@@ -181,21 +181,21 @@ const deleteAccount = async(req,res)=>{
 
         res.json({
 
-            success:true,
+            success: true,
 
-            message:"Account deleted"
+            message: "Account deleted"
 
         });
 
 
-    }catch(error){
+    } catch (error) {
 
 
         res.status(500).json({
 
-            success:false,
+            success: false,
 
-            message:error.message
+            message: error.message
 
         });
 
@@ -221,13 +221,37 @@ const changePassword = async (req, res) => {
 
             return res.status(404).json({
 
-                success:false,
-                message:"User not found"
+                success: false,
+                message: "User not found"
 
             });
 
         }
 
+        if (!oldPassword || !newPassword) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Old password and new password are required"
+
+            });
+
+        }
+
+
+        if (!user.password) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Password not found"
+
+            });
+
+        }
 
         const isMatch =
             await bcrypt.compare(
@@ -240,8 +264,8 @@ const changePassword = async (req, res) => {
 
             return res.status(400).json({
 
-                success:false,
-                message:"Old password incorrect"
+                success: false,
+                message: "Old password incorrect"
 
             });
 
@@ -266,14 +290,14 @@ const changePassword = async (req, res) => {
 
         res.json({
 
-            success:true,
+            success: true,
 
-            message:"Password updated"
+            message: "Password updated"
 
         });
 
 
-    } catch(error) {
+    } catch (error) {
 
 
         console.log(error);
@@ -281,9 +305,9 @@ const changePassword = async (req, res) => {
 
         res.status(500).json({
 
-            success:false,
+            success: false,
 
-            message:error.message
+            message: error.message
 
         });
 

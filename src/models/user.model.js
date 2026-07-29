@@ -54,10 +54,10 @@ WHERE email=$1
         const result = await db.query(
 
             `
-    SELECT id,name,email,provider,created_at
-    FROM users
-    WHERE id=$1
-    `,
+        SELECT *
+        FROM users
+        WHERE id=$1
+        `,
 
             [id]
 
@@ -224,7 +224,7 @@ WHERE email=$1
         return result.rows[0];
 
     }
-    
+
     static async delete(id) {
 
 
