@@ -41,6 +41,12 @@ router.get(
 );
 
 
+router.get(
+    "/:id/details",
+    authMiddleware,
+    getPlantDetails
+);
+
 
 router.delete(
     "/:id",
