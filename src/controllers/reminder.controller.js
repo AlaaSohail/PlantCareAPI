@@ -2,9 +2,8 @@ const Reminder = require("../models/reminder.model");
 const Plant = require("../models/plant.model");
 
 
-
+// Create Reminder
 const createReminder = async (req, res) => {
-
 
     try {
 
@@ -16,13 +15,13 @@ const createReminder = async (req, res) => {
             );
 
 
-
         if (!plant) {
 
             return res.status(404).json({
 
-                success: false,
-                message: "Plant not found"
+                success:false,
+
+                message:"Plant not found"
 
             });
 
@@ -30,96 +29,156 @@ const createReminder = async (req, res) => {
 
 
 
-        const {
-            type,
-            title,
-            description,
-            reminder_date
-        } = req.body || {};
+        const reminder =
+            await Reminder.create({
 
-        if (!type || !title || !reminder_date) {
+                plant_id: plant.id,
 
-            return res.status(400).json({
-                success: false,
-                message: "Type, title and reminder date are required"
+                type: req.body.type,
+
+                title: req.body.title,
+
+                description: req.body.description,
+
+                reminder_date: req.body.reminder_date
+
             });
 
-        }
 
-        const reminder = await Reminder.create({
 
-            plant_id: plant.id,
-            type,
-            title,
-            description,
-            reminder_date
+        res.status(201).json({
 
-        });
-
-        res.json({
-
-            success: true,
+            success:true,
 
             reminder
 
         });
 
 
-    }
-    catch (error) {
+
+    } catch(error) {
+
 
         console.log(error);
 
 
         res.status(500).json({
 
-            success: false,
+            success:false,
 
-            message: "Server error"
+            message:error.message
 
         });
 
-    }
 
+    }
 
 };
 
 
 
 
-const getReminders = async (req, res) => {
+// Get Plant Reminders
+const getReminders = async (req,res)=>{
 
 
-    try {
+    try{
+
+
+        const plant =
+            await Plant.findById(
+                req.params.id,
+                req.user.id
+            );
+
+
+        if(!plant){
+
+            return res.status(404).json({
+
+                success:false,
+
+                message:"Plant not found"
+
+            });
+
+        }
+
 
 
         const reminders =
-            await Reminder.findByUser(
-                req.user.id
+            await Reminder.findByPlant(
+                plant.id
             );
 
 
 
         res.json({
 
-            success: true,
+            success:true,
 
             reminders
 
         });
 
 
-    }
-    catch (error) {
+
+    }catch(error){
+
 
         console.log(error);
 
 
         res.status(500).json({
 
-            success: false,
+            success:false,
 
-            message: "Server error"
+            message:error.message
+
+        });
+
+
+    }
+
+
+};
+
+
+
+
+
+// Complete Reminder
+const completeReminder = async(req,res)=>{
+
+
+    try{
+
+
+        const reminder =
+            await Reminder.complete(
+                req.params.id
+            );
+
+
+
+        res.json({
+
+            success:true,
+
+            reminder
+
+        });
+
+
+
+    }catch(error){
+
+
+        res.status(500).json({
+
+            success:false,
+
+            message:error.message
 
         });
 
@@ -127,6 +186,51 @@ const getReminders = async (req, res) => {
 
 
 };
+
+
+
+
+
+// Delete Reminder
+const deleteReminder = async(req,res)=>{
+
+
+    try{
+
+
+        await Reminder.delete(
+            req.params.id
+        );
+
+
+        res.json({
+
+            success:true,
+
+            message:"Reminder deleted"
+
+        });
+
+
+
+    }catch(error){
+
+
+        res.status(500).json({
+
+            success:false,
+
+            message:error.message
+
+        });
+
+
+    }
+
+
+};
+
+
 
 
 
@@ -134,6 +238,10 @@ module.exports = {
 
     createReminder,
 
-    getReminders
+    getReminders,
+
+    completeReminder,
+
+    deleteReminder
 
 };

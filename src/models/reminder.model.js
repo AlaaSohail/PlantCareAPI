@@ -6,37 +6,32 @@ class Reminder {
 
     static async create(data) {
 
-        const {
-            plant_id,
-            type,
-            title,
-            description,
-            reminder_date
-        } = data;
-
 
         const result = await db.query(
+
             `
-        INSERT INTO reminders
-        (
-            plant_id,
-            type,
-            title,
-            description,
-            reminder_date
-        )
-
-        VALUES($1,$2,$3,$4,$5)
-
-        RETURNING *
-        `,
-            [
+            INSERT INTO reminders
+            (
                 plant_id,
                 type,
                 title,
                 description,
                 reminder_date
+            )
+
+            VALUES($1,$2,$3,$4,$5)
+
+            RETURNING *
+            `,
+
+            [
+                data.plant_id,
+                data.type,
+                data.title,
+                data.description,
+                data.reminder_date
             ]
+
         );
 
 
@@ -45,39 +40,147 @@ class Reminder {
     }
 
 
-    static async findByUser(user_id) {
 
 
-        const result =
-            await db.query(
+    static async findByPlant(plant_id) {
 
-                `
-SELECT 
-reminders.*,
-plants.name
 
-FROM reminders
+        const result = await db.query(
 
-JOIN plants
+            `
+            SELECT *
+            FROM reminders
+            WHERE plant_id=$1
+            ORDER BY reminder_date ASC
+            `,
 
-ON plants.id = reminders.plant_id
+            [
+                plant_id
+            ]
 
-WHERE plants.user_id=$1
-
-ORDER BY reminder_date ASC
-
-`,
-
-                [user_id]
-
-            );
+        );
 
 
         return result.rows;
 
+    }
+
+
+
+
+
+    static async findById(id) {
+
+
+        const result = await db.query(
+
+            `
+            SELECT *
+            FROM reminders
+            WHERE id=$1
+            `,
+
+            [
+                id
+            ]
+
+        );
+
+
+        return result.rows[0];
 
     }
 
+
+
+
+
+    static async update(id, data) {
+
+
+        const result = await db.query(
+
+            `
+            UPDATE reminders
+
+            SET
+                title=$1,
+                description=$2,
+                reminder_date=$3,
+                type=$4
+
+            WHERE id=$5
+
+            RETURNING *
+            `,
+
+            [
+                data.title,
+                data.description,
+                data.reminder_date,
+                data.type,
+                id
+            ]
+
+        );
+
+
+        return result.rows[0];
+
+    }
+
+
+
+
+
+    static async complete(id) {
+
+
+        const result = await db.query(
+
+            `
+            UPDATE reminders
+
+            SET
+                is_completed=true
+
+            WHERE id=$1
+
+            RETURNING *
+            `,
+
+            [
+                id
+            ]
+
+        );
+
+
+        return result.rows[0];
+
+    }
+
+
+
+
+
+    static async delete(id) {
+
+
+        await db.query(
+
+            `
+            DELETE FROM reminders
+            WHERE id=$1
+            `,
+
+            [
+                id
+            ]
+
+        );
+
+    }
 
 
 }

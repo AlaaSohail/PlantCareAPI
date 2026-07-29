@@ -251,14 +251,12 @@ const forgotPassword = async (req, res) => {
             token,
             expire
         );
-        console.log("BEFORE SEND EMAIL");
 
         await sendResetEmail(
             email,
             token
         );
 
-        console.log("AFTER SEND EMAIL");
         res.json({
             success: true,
             message: "Reset token created",

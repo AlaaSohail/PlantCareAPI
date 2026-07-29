@@ -214,20 +214,12 @@ const deleteAccount = async (req, res) => {
             );
 
 
-        console.log(
-            "USER PLANTS:",
-            plants
-        );
-
+       
 
 
         for (const plant of plants) {
 
 
-            console.log(
-                "Deleting plant:",
-                plant.id
-            );
 
 
 
@@ -235,10 +227,7 @@ const deleteAccount = async (req, res) => {
             if (plant.image_url) {
 
 
-                console.log(
-                    "Deleting plant image:",
-                    plant.image_url
-                );
+              
 
 
                 await deleteImage(
@@ -263,10 +252,7 @@ const deleteAccount = async (req, res) => {
                 if (image.image_url) {
 
 
-                    console.log(
-                        "Deleting AI image:",
-                        image.image_url
-                    );
+                  
 
 
                     await deleteImage(
