@@ -6,6 +6,10 @@ const authMiddleware =
     require("../middleware/auth.middleware");
 
 
+const upload =
+    require("../middleware/upload.middleware");
+
+
 const {
 
     createPlant,
@@ -17,11 +21,15 @@ const {
 
 } = require("../controllers/plant.controller");
 
+
+
 router.post(
     "/",
     authMiddleware,
+    upload.single("image"),
     createPlant
 );
+
 
 
 router.get(
@@ -31,11 +39,13 @@ router.get(
 );
 
 
+
 router.get(
     "/:id",
     authMiddleware,
     getPlant
 );
+
 
 
 router.get(
@@ -45,15 +55,22 @@ router.get(
 );
 
 
+
 router.delete(
     "/:id",
     authMiddleware,
     deletePlant
 );
 
+
+
 router.put(
- "/:id",
- authMiddleware,
- updatePlant
+    "/:id",
+    authMiddleware,
+    upload.single("image"),
+    updatePlant
 );
+
+
+
 module.exports = router;
