@@ -1,6 +1,14 @@
 const express = require("express");
-
 const router = express.Router();
+
+router.get("/test", (req, res) => {
+
+    res.json({
+        success: true,
+        message: "Auth route working"
+    });
+
+});
 const authenticateToken = require("../middleware/auth.middleware");
 
 
@@ -10,7 +18,7 @@ const {
     forgotPassword,
     resetPassword,
     logout,
-    
+
 } = require("../controllers/auth.controller");
 
 
