@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
+const Token = require("../models/token.model");
 
 
-const authMiddleware = (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
 
     try {
 
@@ -18,22 +19,49 @@ const authMiddleware = (req, res, next) => {
             });
 
         }
+
+
         const parts = authHeader.split(" ");
 
+
         if (parts.length !== 2 || parts[0] !== "Bearer") {
+
             return res.status(401).json({
+
                 success: false,
                 message: "Invalid authorization format"
+
             });
+
         }
+
 
         const token = parts[1];
 
 
+        // فحص هل تم تسجيل الخروج بهذا الـ Token
+        const blacklisted = await Token.isBlacklisted(token);
+
+
+        if (blacklisted) {
+
+            return res.status(401).json({
+
+                success: false,
+                message: "Token has been logged out"
+
+            });
+
+        }
+
+
 
         const decoded = jwt.verify(
+
             token,
+
             process.env.JWT_SECRET
+
         );
 
 

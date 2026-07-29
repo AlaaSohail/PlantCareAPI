@@ -1,13 +1,16 @@
 const express = require("express");
 
 const router = express.Router();
+const authenticateToken = require("../middleware/auth.middleware");
 
 
 const {
     register,
     login,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    logout,
+    
 } = require("../controllers/auth.controller");
 
 
@@ -57,6 +60,7 @@ router.post(
     resetPassword
 );
 
+router.post("/logout", authenticateToken, logout);
 
 // Google Login
 const { googleLogin } = require("../controllers/social.controller");

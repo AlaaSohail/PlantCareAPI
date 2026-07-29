@@ -69,50 +69,50 @@ WHERE email=$1
     }
 
 
-    static async saveResetToken(email, token, expire){
+    static async saveResetToken(email, token, expire) {
 
-    const result = await db.query(
-        `
+        const result = await db.query(
+            `
         UPDATE users
         SET reset_token=$1,
         reset_token_expire=$2
         WHERE email=$3
         RETURNING *
         `,
-        [
-            token,
-            expire,
-            email
-        ]
-    );
+            [
+                token,
+                expire,
+                email
+            ]
+        );
 
-    return result.rows[0];
+        return result.rows[0];
 
-}
+    }
 
 
-static async findByResetToken(token){
+    static async findByResetToken(token) {
 
-    const result = await db.query(
-        `
+        const result = await db.query(
+            `
         SELECT *
         FROM users
         WHERE reset_token=$1
         AND reset_token_expire > NOW()
         `,
-        [token]
-    );
+            [token]
+        );
 
 
-    return result.rows[0];
+        return result.rows[0];
 
-}
+    }
 
 
-static async updatePassword(id,password){
+    static async updatePassword(id, password) {
 
-    const result = await db.query(
-        `
+        const result = await db.query(
+            `
         UPDATE users
         SET password=$1,
         reset_token=NULL,
@@ -120,18 +120,74 @@ static async updatePassword(id,password){
         WHERE id=$2
         RETURNING *
         `,
-        [
-            password,
-            id
-        ]
+            [
+                password,
+                id
+            ]
+        );
+
+
+        return result.rows[0];
+
+    }
+
+    static async findAll() {
+
+        const result = await db.query(
+            `
+        SELECT 
+            id,
+            name,
+            email,
+            provider,
+            created_at,
+            role
+        FROM users
+        `
+        );
+
+        return result.rows;
+
+    }
+
+    static async findAllPaginated(limit, offset) {
+
+        const result = await db.query(
+            `
+        SELECT
+            id,
+            name,
+            email,
+            provider,
+            created_at,
+            role
+        FROM users
+        ORDER BY id DESC
+        LIMIT $1 OFFSET $2
+        `,
+            [
+                limit,
+                offset
+            ]
+        );
+
+
+        return result.rows;
+
+    }
+    static async countUsers(){
+
+    const result = await db.query(
+        `
+        SELECT COUNT(*) 
+        FROM users
+        `
     );
 
 
-    return result.rows[0];
+    return parseInt(result.rows[0].count);
 
 }
-
-
 }
 
 

@@ -57,8 +57,66 @@ const profile = async (req, res) => {
 
 
 };
+const getUsers = async (req, res) => {
 
+    try {
+
+
+        const page = parseInt(req.query.page) || 1;
+
+        const limit = Math.min(
+            parseInt(req.query.limit) || 10,
+            50
+        );
+
+        const offset = (page - 1) * limit;
+
+
+
+        const users = await User.findAllPaginated(
+            limit,
+            offset
+        );
+
+
+        const totalUsers = await User.countUsers();
+
+
+
+        res.json({
+
+            success: true,
+
+            pagination: {
+                page,
+                limit,
+                totalUsers,
+                totalPages: Math.ceil(totalUsers / limit)
+            },
+
+            users
+
+        });
+
+
+
+    } catch (error) {
+
+        console.log(error);
+
+
+        res.status(500).json({
+
+            success: false,
+            message: "Server error"
+
+        });
+
+    }
+
+};
 
 module.exports = {
-    profile
+    profile,
+    getUsers
 };

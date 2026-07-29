@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
+const Token = require("../models/token.model");
 
 
 const register = async (req, res) => {
@@ -168,7 +169,8 @@ const login = async (req, res) => {
         res.status(500).json({
 
             success: false,
-            message: "Server error"
+            message: error.message
+
 
         });
 
@@ -180,7 +182,56 @@ const login = async (req, res) => {
 
 
 
+const logout = async (req, res) => {
 
+    try {
+
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+
+            return res.status(401).json({
+                success: false,
+                message: "Token required"
+            });
+
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        console.log("LOGOUT TOKEN:", token);
+
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
+
+        console.log(decoded);
+
+        const expiresAt = new Date(decoded.exp * 1000);
+
+        await Token.blacklist(
+            token,
+            expiresAt
+        );
+
+        res.json({
+            success: true,
+            message: "Logout successful"
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(401).json({
+            success: false,
+            message: "Invalid token"
+        });
+
+    }
+
+};
 
 const crypto = require("crypto");
 
@@ -293,5 +344,6 @@ module.exports = {
     register,
     login,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    logout
 };
