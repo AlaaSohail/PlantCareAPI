@@ -1,11 +1,8 @@
 const db = require("../config/database");
 
-
 class Reminder {
 
-
     static async create(data) {
-
 
         const result = await db.query(
 
@@ -16,10 +13,11 @@ class Reminder {
                 type,
                 title,
                 description,
-                reminder_date
+                reminder_date,
+                repeat_type
             )
 
-            VALUES($1,$2,$3,$4,$5)
+            VALUES($1,$2,$3,$4,$5,$6)
 
             RETURNING *
             `,
@@ -29,11 +27,11 @@ class Reminder {
                 data.type,
                 data.title,
                 data.description,
-                data.reminder_date
+                data.reminder_date,
+                data.repeat_type || "once"
             ]
 
         );
-
 
         return result.rows[0];
 
@@ -41,9 +39,7 @@ class Reminder {
 
 
 
-
     static async findByPlant(plant_id) {
-
 
         const result = await db.query(
 
@@ -60,17 +56,13 @@ class Reminder {
 
         );
 
-
         return result.rows;
 
     }
 
 
 
-
-
     static async findById(id) {
-
 
         const result = await db.query(
 
@@ -86,17 +78,13 @@ class Reminder {
 
         );
 
-
         return result.rows[0];
 
     }
 
 
 
-
-
     static async update(id, data) {
-
 
         const result = await db.query(
 
@@ -107,9 +95,10 @@ class Reminder {
                 title=$1,
                 description=$2,
                 reminder_date=$3,
-                type=$4
+                type=$4,
+                repeat_type=$5
 
-            WHERE id=$5
+            WHERE id=$6
 
             RETURNING *
             `,
@@ -119,53 +108,19 @@ class Reminder {
                 data.description,
                 data.reminder_date,
                 data.type,
+                data.repeat_type || "once",
                 id
             ]
 
         );
 
-
         return result.rows[0];
 
     }
-
-
-
-
-
-    static async complete(id) {
-
-
-        const result = await db.query(
-
-            `
-            UPDATE reminders
-
-            SET
-                is_completed=true
-
-            WHERE id=$1
-
-            RETURNING *
-            `,
-
-            [
-                id
-            ]
-
-        );
-
-
-        return result.rows[0];
-
-    }
-
-
 
 
 
     static async delete(id) {
-
 
         await db.query(
 
@@ -183,7 +138,81 @@ class Reminder {
     }
 
 
-}
 
+    static async findPending() {
+
+        const result = await db.query(
+
+            `
+            SELECT *
+            FROM reminders
+            WHERE
+                is_completed = false
+                AND reminder_date <= NOW()
+            ORDER BY reminder_date ASC
+            `
+
+        );
+
+        return result.rows;
+
+    }
+
+
+
+    static async markCompleted(id) {
+
+        const result = await db.query(
+
+            `
+            UPDATE reminders
+
+            SET
+                is_completed = true
+
+            WHERE id=$1
+
+            RETURNING *
+            `,
+
+            [
+                id
+            ]
+
+        );
+
+        return result.rows[0];
+
+    }
+
+
+
+    static async updateNextDate(id, nextDate) {
+
+        const result = await db.query(
+
+            `
+            UPDATE reminders
+
+            SET
+                reminder_date=$1
+
+            WHERE id=$2
+
+            RETURNING *
+            `,
+
+            [
+                nextDate,
+                id
+            ]
+
+        );
+
+        return result.rows[0];
+
+    }
+
+}
 
 module.exports = Reminder;

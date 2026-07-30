@@ -14,7 +14,8 @@ const {
 
     completeReminder,
 
-    deleteReminder
+    deleteReminder,
+    updateReminder
 
 } = require("../controllers/reminder.controller");
 
@@ -54,6 +55,10 @@ router.delete(
     deleteReminder
 );
 
-
+router.put(
+    "/reminders/:id",
+    authMiddleware,
+    updateReminder
+);
 
 module.exports = router;

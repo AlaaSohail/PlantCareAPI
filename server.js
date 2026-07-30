@@ -1,11 +1,12 @@
 require("dotenv").config();
 const app = require("./src/app");
-
 const db = require("./src/config/database");
 require("./src/jobs/tokenCleanup.job");
+require("./src/jobs/reminder.job");
 const helmet = require("helmet");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
+
 
 
 // Security Middleware
