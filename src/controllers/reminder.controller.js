@@ -1,14 +1,14 @@
 const Reminder = require("../models/reminder.model");
 const Plant = require("../models/plant.model");
 const CareTip =
-require("../models/careTip.model");
+    require("../models/careTip.model");
 
 
 const {
-generateCarePlan
+    generateCarePlan
 }
-=
-require("../services/carePlan.service");
+    =
+    require("../services/carePlan.service");
 
 // Create Reminder
 const createReminder = async (req, res) => {
@@ -332,101 +332,101 @@ const deleteReminder = async (req, res) => {
 
 };
 
-const createCarePlan = async(req,res)=>{
+const createCarePlan = async (req, res) => {
 
 
-try{
+    try {
 
 
-const plant =
-await Plant.findById(
+        const plant =
+            await Plant.findById(
 
-    req.params.plantId,
+                req.params.plantId,
 
-    req.user.id
+                req.user.id
 
-);
-
-
-
-if(!plant){
-
-return res.status(404).json({
-
-success:false,
-
-message:"Plant not found"
-
-});
-
-}
+            );
 
 
 
-const tips =
-await CareTip.findByPlant(
-    plant.id
-);
+        if (!plant) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Plant not found"
+
+            });
+
+        }
 
 
 
-if(!tips.length){
-
-return res.status(400).json({
-
-success:false,
-
-message:"No care suggestions found"
-
-});
-
-}
+        const tips =
+            await CareTip.findByPlant(
+                plant.id
+            );
 
 
 
-const plan =
-generateCarePlan(
+        if (!tips.length) {
 
-    plant.id,
+            return res.status(400).json({
 
-    tips
+                success: false,
 
-);
+                message: "No care suggestions found"
 
+            });
 
-
-const reminders =
-await Reminder.createCarePlan(
-    plan
-);
+        }
 
 
 
-res.json({
+        const plan =
+            generateCarePlan(
 
-success:true,
+                plant.id,
 
-message:"Care plan created 🌱",
+                tips
 
-reminders
-
-});
-
+            );
 
 
-}catch(error){
+
+        const reminders =
+            await Reminder.createCarePlan(
+                plan
+            );
 
 
-res.status(500).json({
 
-success:false,
+        res.json({
 
-message:error.message
+            success: true,
 
-});
+            message: "Care plan created 🌱",
+
+            reminders
+
+        });
 
 
-}
+
+    } catch (error) {
+
+
+        res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+
+    }
 
 
 };

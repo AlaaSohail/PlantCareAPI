@@ -15,7 +15,10 @@ const {
     completeReminder,
 
     deleteReminder,
-    updateReminder
+
+    updateReminder,
+
+    createCarePlan
 
 } = require("../controllers/reminder.controller");
 
