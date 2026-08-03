@@ -15,12 +15,15 @@ name,
 email,
 password,
 phone_number,
-location,
 user_image,
+latitude,
+longitude,
+country,
+city,
 fcm_token
 )
 
-VALUES($1,$2,$3,$4,$5,$6,$7)
+VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
 
 RETURNING *
 `,
@@ -30,8 +33,11 @@ RETURNING *
                 data.email,
                 data.password,
                 data.phoneNumber,
-                data.location,
                 data.userImage,
+                data.latitude,
+                data.longitude,
+                data.country,
+                data.city,
                 data.fcm_token
             ]
 

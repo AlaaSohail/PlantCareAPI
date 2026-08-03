@@ -4,8 +4,9 @@ const User = require("../models/user.model");
 const Token = require("../models/token.model");
 const sendResetEmail =
     require("../services/email.service");
+const getLocationDetails =
+    require("../services/location.service");
 const register = async (req, res) => {
-    console.log("REGISTER BODY:", req.body);
     try {
 
         const {
@@ -16,6 +17,8 @@ const register = async (req, res) => {
             phoneNumber,
             location,
             userImage,
+            latitude,
+            longitude,
             fcm_token
         } = req.body || {};
 
@@ -48,16 +51,35 @@ const register = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        const locationDetails =
+            await getLocationDetails(
+                latitude,
+                longitude
+            );
 
 
         const user = await User.create({
 
             name,
+
             email,
+
             password: hashedPassword,
+
             phoneNumber,
-            location,
+
             userImage,
+
+            latitude,
+
+            longitude,
+
+            country:
+                locationDetails.country,
+
+            city:
+                locationDetails.city,
+
             fcm_token
 
         });

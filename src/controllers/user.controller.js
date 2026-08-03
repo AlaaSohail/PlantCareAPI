@@ -16,9 +16,11 @@ const profile = async (req, res) => {
 
     try {
 
-        const user = await User.findById(
-            req.user.id
-        );
+
+        const user =
+            await User.findById(
+                req.user.id
+            );
 
 
         if (!user) {
@@ -26,6 +28,7 @@ const profile = async (req, res) => {
             return res.status(404).json({
 
                 success: false,
+
                 message: "User not found"
 
             });
@@ -38,39 +41,48 @@ const profile = async (req, res) => {
             success: true,
 
             user: {
-
                 id: user.id,
 
                 name: user.name,
 
                 email: user.email,
 
-                phoneNumber: user.phone_number,
+                phoneNumber:
+                    user.phone_number,
 
-                location: user.location,
+                userImage:
+                    user.user_image,
 
-                userImage: user.user_image
+                latitude:
+                    user.latitude,
 
+                longitude:
+                    user.longitude,
+
+                country:
+                    user.country,
+
+                city:
+                    user.city
             }
 
         });
 
 
-    } catch (error) {
 
-        console.log(error);
+    } catch (error) {
 
         res.status(500).json({
 
             success: false,
-            message: "Server error"
+
+            message: error.message
 
         });
 
     }
 
 };
-
 
 
 
