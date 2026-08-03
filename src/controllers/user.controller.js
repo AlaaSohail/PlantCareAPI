@@ -38,13 +38,19 @@ const profile = async (req, res) => {
             success: true,
 
             user: {
+
                 id: user.id,
+
                 name: user.name,
+
                 email: user.email,
+
                 phoneNumber: user.phone_number,
+
                 location: user.location,
-                userImage: user.user_image,
-                
+
+                userImage: user.user_image
+
             }
 
         });
