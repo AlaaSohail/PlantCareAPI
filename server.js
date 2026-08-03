@@ -8,7 +8,14 @@ const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 
 
+const notificationRoutes =
+    require("./routes/notification.routes");
 
+
+app.use(
+    "/api/notifications",
+    notificationRoutes
+);
 // Security Middleware
 
 app.use(helmet());
@@ -25,6 +32,7 @@ app.use(cors({
         "GET",
         "POST",
         "PUT",
+        "PATCH",
         "DELETE"
     ],
 

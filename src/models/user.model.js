@@ -10,15 +10,29 @@ class User {
 
             `
 INSERT INTO users
-(name,email,password)
-VALUES($1,$2,$3)
+(
+name,
+email,
+password,
+phone_number,
+location,
+user_image,
+fcm_token
+)
+
+VALUES($1,$2,$3,$4,$5,$6,$7)
+
 RETURNING *
 `,
 
             [
                 data.name,
                 data.email,
-                data.password
+                data.password,
+                data.phoneNumber,
+                data.location,
+                data.userImage,
+                data.fcm_token || null
             ]
 
         );
@@ -27,7 +41,6 @@ RETURNING *
         return result.rows[0];
 
     }
-
 
 
     static async findByEmail(email) {
@@ -139,6 +152,10 @@ WHERE email=$1
             id,
             name,
             email,
+            phone_number,
+            location,
+            user_image,
+        
             provider,
             created_at,
             role
@@ -158,6 +175,9 @@ WHERE email=$1
             id,
             name,
             email,
+            phone_number,
+            location,
+            user_image,
             provider,
             created_at,
             role
@@ -209,12 +229,19 @@ WHERE email=$1
         name,
         email,
         role,
+        phone_number,
+        user_image,
+        location,
         created_at
         `,
 
             [
+                data.phoneNumber,
+                data.location,
+                data.userImage,
                 data.name,
                 data.email,
+
                 id
             ]
 

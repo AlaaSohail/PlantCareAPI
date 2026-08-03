@@ -41,7 +41,7 @@ router.get(
 
 // Complete reminder
 router.put(
-    "/reminders/:id/complete",
+    "/plants/:id/reminders/:id/complete",
     authMiddleware,
     completeReminder
 );
@@ -50,15 +50,24 @@ router.put(
 
 // Delete reminder
 router.delete(
-    "/reminders/:id",
+    "/plants/:id/reminders/:id",
     authMiddleware,
     deleteReminder
 );
 
 router.put(
-    "/reminders/:id",
+    "/plants/:id/reminders/:id",
     authMiddleware,
     updateReminder
+);
+router.post(
+
+    "/plants/:plantId/care-plan",
+
+    authMiddleware,
+
+    createCarePlan
+
 );
 
 module.exports = router;

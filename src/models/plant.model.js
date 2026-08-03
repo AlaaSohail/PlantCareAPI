@@ -118,10 +118,12 @@ class Plant {
 
     static async getDetails(id) {
 
+
         const result = await db.query(
 
             `
         SELECT 
+
             p.id,
             p.user_id,
             p.name,
@@ -129,11 +131,16 @@ class Plant {
             p.image_url,
             p.created_at,
 
+
             (
-                SELECT json_agg(r)
-                FROM reminders r
-                WHERE r.plant_id = p.id
-            ) AS reminders,
+    SELECT COALESCE(
+        json_agg(r),
+        '[]'
+    )
+    FROM reminders r
+    WHERE r.plant_id = p.id
+) AS reminders,
+
 
             (
                 SELECT row_to_json(a)
@@ -141,14 +148,37 @@ class Plant {
                 WHERE a.plant_id = p.id
                 ORDER BY a.created_at DESC
                 LIMIT 1
-            ) AS latest_analysis
+            ) AS latest_analysis,
+
+
+            (
+                SELECT row_to_json(h)
+                FROM plant_health h
+                WHERE h.plant_id = p.id
+                ORDER BY h.created_at DESC
+                LIMIT 1
+            ) AS health,
+
+
+           (
+    SELECT COALESCE(
+        json_agg(t),
+        '[]'
+    )
+    FROM plant_care_tips t
+    WHERE t.plant_id = p.id
+) AS care_tips
+
 
         FROM plants p
 
         WHERE p.id=$1
+
         `,
 
-            [id]
+            [
+                id
+            ]
 
         );
 

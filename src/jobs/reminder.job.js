@@ -7,7 +7,8 @@ const {
     getNextDate
 } = require("../utils/reminder.utils");
 
-
+const Notification =
+    require("../models/notification.model");
 cron.schedule("* * * * *", async () => {
 
     try {
@@ -36,6 +37,21 @@ cron.schedule("* * * * *", async () => {
                 date: reminder.reminder_date
             });
 
+            await Notification.create({
+
+                user_id:
+                    reminder.user_id,
+
+                plant_id:
+                    reminder.plant_id,
+
+                title:
+                    reminder.title,
+
+                message:
+                    reminder.description
+
+            });
 
             if (
                 reminder.repeat_type === "daily" ||
@@ -50,7 +66,7 @@ cron.schedule("* * * * *", async () => {
                     );
 
 
-                await Reminder.updateNextDate(
+                await Reminder.updateCompleted(
                     reminder.id,
                     nextDate
                 );

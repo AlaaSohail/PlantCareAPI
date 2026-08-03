@@ -8,11 +8,20 @@ const register = async (req, res) => {
 
     try {
 
-        const { name, email, password } = req.body || {};;
+        const {
+            name,
+            email,
+            password,
+            confirmPassword,
+            phoneNumber,
+            location,
+            userImage,
+            fcm_token
+        } = req.body || {};
 
 
         // التحقق من البيانات
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !confirmPassword || !phoneNumber || !location) {
 
             return res.status(400).json({
                 success: false,
@@ -44,9 +53,12 @@ const register = async (req, res) => {
         const user = await User.create({
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            phoneNumber,
+            location,
+            userImage,
+            fcm_token
         });
-
 
         res.status(201).json({
 
@@ -56,7 +68,11 @@ const register = async (req, res) => {
             user: {
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+                location: user.location,
+                userImage: user.userImage
+
             }
 
         });
@@ -150,7 +166,10 @@ const login = async (req, res) => {
             user: {
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+                location: user.location,
+                userImage: user.userImage
             }
 
         });

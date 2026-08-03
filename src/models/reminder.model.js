@@ -144,12 +144,21 @@ class Reminder {
         const result = await db.query(
 
             `
-            SELECT *
-            FROM reminders
-            WHERE
-                is_completed = false
-                AND reminder_date <= NOW()
-            ORDER BY reminder_date ASC
+           SELECT 
+
+r.*,
+
+p.user_id
+
+FROM reminders r
+
+JOIN plants p
+
+ON r.plant_id = p.id
+
+WHERE r.reminder_date <= NOW()
+
+AND r.is_completed=false
             `
 
         );
@@ -212,7 +221,92 @@ class Reminder {
         return result.rows[0];
 
     }
+    static async createCarePlan(data) {
 
+
+        const reminders = [];
+
+
+        for (const reminder of data) {
+
+
+            const result = await db.query(
+
+                `
+            INSERT INTO reminders
+            (
+                plant_id,
+                type,
+                title,
+                description,
+                reminder_date,
+                repeat_type
+            )
+
+            VALUES($1,$2,$3,$4,$5,$6)
+
+            RETURNING *
+            `,
+
+                [
+
+                    reminder.plant_id,
+
+                    reminder.type,
+
+                    reminder.title,
+
+                    reminder.description,
+
+                    reminder.reminder_date,
+
+                    reminder.repeat_type
+
+                ]
+
+            );
+
+
+            reminders.push(
+                result.rows[0]
+            );
+
+
+        }
+
+
+        return reminders;
+
+    }
+    static async updateCompleted(id, nextDate) {
+
+
+        const result =
+            await db.query(
+
+                `
+        UPDATE reminders
+
+        SET
+            reminder_date=$1,
+            last_completed_at=NOW()
+
+        WHERE id=$2
+
+        RETURNING *
+        `,
+
+                [
+                    nextDate,
+                    id
+                ]
+
+            );
+
+
+        return result.rows[0];
+
+    }
 }
 
 module.exports = Reminder;

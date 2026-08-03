@@ -1,28 +1,42 @@
-const getNextDate = (currentDate, repeatType) => {
+function getNextDate(date, type) {
 
-    const nextDate = new Date(currentDate);
+    const next =
+        new Date(date);
 
-    switch (repeatType) {
+
+    switch (type) {
 
         case "daily":
-            nextDate.setDate(nextDate.getDate() + 1);
+
+            next.setDate(
+                next.getDate() + 1
+            );
+
             break;
+
+
 
         case "weekly":
-            nextDate.setDate(nextDate.getDate() + 7);
+
+            next.setDate(
+                next.getDate() + 7
+            );
+
             break;
+
+
 
         case "monthly":
-            nextDate.setMonth(nextDate.getMonth() + 1);
+
+            next.setMonth(
+                next.getMonth() + 1
+            );
+
             break;
 
-        default:
-            return null;
     }
 
-    return nextDate;
-};
 
-module.exports = {
-    getNextDate
-};
+    return next;
+
+}

@@ -1,6 +1,14 @@
 const Reminder = require("../models/reminder.model");
 const Plant = require("../models/plant.model");
+const CareTip =
+require("../models/careTip.model");
 
+
+const {
+generateCarePlan
+}
+=
+require("../services/carePlan.service");
 
 // Create Reminder
 const createReminder = async (req, res) => {
@@ -209,11 +217,29 @@ const updateReminder = async (req, res) => {
 
     try {
 
+        const plant =
+            await Plant.findById(
+                req.params.plantId,
+                req.user.id
+            );
+
+
+        if (!plant) {
+
+            return res.status(404).json({
+
+                success: false,
+                message: "Plant not found"
+
+            });
+
+        }
+
 
         const reminder =
             await Reminder.update(
 
-                req.params.id,
+                req.params.reminderId,
 
                 {
 
@@ -237,13 +263,11 @@ const updateReminder = async (req, res) => {
             return res.status(404).json({
 
                 success: false,
-
                 message: "Reminder not found"
 
             });
 
         }
-
 
 
         res.json({
@@ -255,12 +279,7 @@ const updateReminder = async (req, res) => {
         });
 
 
-
     } catch (error) {
-
-
-        console.log(error);
-
 
         res.status(500).json({
 
@@ -269,7 +288,6 @@ const updateReminder = async (req, res) => {
             message: error.message
 
         });
-
 
     }
 
@@ -314,7 +332,104 @@ const deleteReminder = async (req, res) => {
 
 };
 
+const createCarePlan = async(req,res)=>{
 
+
+try{
+
+
+const plant =
+await Plant.findById(
+
+    req.params.plantId,
+
+    req.user.id
+
+);
+
+
+
+if(!plant){
+
+return res.status(404).json({
+
+success:false,
+
+message:"Plant not found"
+
+});
+
+}
+
+
+
+const tips =
+await CareTip.findByPlant(
+    plant.id
+);
+
+
+
+if(!tips.length){
+
+return res.status(400).json({
+
+success:false,
+
+message:"No care suggestions found"
+
+});
+
+}
+
+
+
+const plan =
+generateCarePlan(
+
+    plant.id,
+
+    tips
+
+);
+
+
+
+const reminders =
+await Reminder.createCarePlan(
+    plan
+);
+
+
+
+res.json({
+
+success:true,
+
+message:"Care plan created 🌱",
+
+reminders
+
+});
+
+
+
+}catch(error){
+
+
+res.status(500).json({
+
+success:false,
+
+message:error.message
+
+});
+
+
+}
+
+
+};
 
 
 
@@ -328,6 +443,7 @@ module.exports = {
 
     deleteReminder,
 
-    updateReminder 
+    updateReminder,
+    createCarePlan
 
 };

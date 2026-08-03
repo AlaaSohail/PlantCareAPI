@@ -5,7 +5,23 @@ const analyzePlantImage =
     require("../services/ai.service");
 
 const Plant = require("../models/plant.model");
+const PlantHealth =
+    require("../models/plantHealth.model");
 
+
+const {
+    calculateHealthScore
+} =
+    require("../services/health.service");
+const CareTip =
+    require("../models/careTip.model");
+
+
+const {
+    generateCareTips
+}
+    =
+    require("../services/care.service");
 const analyzePlant = async (req, res) => {
 
     try {
@@ -87,7 +103,46 @@ const analyzePlant = async (req, res) => {
 
             });
 
+        const healthScore =
+            calculateHealthScore(aiResult);
 
+
+
+        await PlantHealth.create({
+
+            plant_id: plant.id,
+
+            health_score: healthScore,
+
+            health_status:
+                aiResult.health_status,
+
+            last_analysis_id:
+                savedAnalysis.id
+
+        });
+        const tips =
+            generateCareTips(aiResult);
+
+
+
+        for (const tip of tips) {
+
+
+            await CareTip.create({
+
+                plant_id: plant.id,
+
+                type: tip.type,
+
+                title: tip.title,
+
+                description: tip.description
+
+            });
+
+
+        }
 
         res.json({
 
