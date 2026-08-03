@@ -8,22 +8,29 @@ const getLocationDetails = async (
 
     try {
 
-        const response =
-            await axios.get(
-                "https://nominatim.openstreetmap.org/reverse",
-                {
-                    params: {
-                        lat: latitude,
-                        lon: longitude,
-                        format: "json"
-                    },
+        const response = await axios.get(
+            "https://nominatim.openstreetmap.org/reverse",
+            {
+                params:{
+                    lat: latitude,
+                    lon: longitude,
+                    format:"json",
+                    addressdetails:1
+                },
 
-                    headers:{
-                        "User-Agent":
-                        "PlantCare-App"
-                    }
+                headers:{
+                    "User-Agent":
+                    "PlantCare-App"
                 }
-            );
+
+            }
+        );
+
+
+        console.log(
+            "LOCATION DATA:",
+            response.data.address
+        );
 
 
         const address =
@@ -40,6 +47,9 @@ const getLocationDetails = async (
                 address.city ||
                 address.town ||
                 address.village ||
+                address.municipality ||
+                address.county ||
+                address.state ||
                 null
 
         };
@@ -54,11 +64,8 @@ const getLocationDetails = async (
 
 
         return {
-
             country:null,
-
             city:null
-
         };
 
     }
@@ -66,5 +73,4 @@ const getLocationDetails = async (
 };
 
 
-module.exports =
-    getLocationDetails;
+module.exports = getLocationDetails;
