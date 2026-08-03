@@ -9,48 +9,34 @@ const getLocationDetails = async (
     try {
 
         const response = await axios.get(
-            "https://nominatim.openstreetmap.org/reverse",
+            "https://api.geoapify.com/v1/geocode/reverse",
             {
                 params:{
                     lat: latitude,
                     lon: longitude,
-                    format:"json",
-                    addressdetails:1
-                },
-
-                headers:{
-                    "User-Agent":
-                    "PlantCare-App"
+                    apiKey:
+                    process.env.GEOAPIFY_KEY
                 }
-
             }
         );
 
 
-        console.log(
-            "LOCATION DATA:",
-            response.data.address
-        );
-
-
-        const address =
-            response.data.address;
+        const properties =
+            response.data.features[0]
+            ?.properties;
 
 
         return {
 
             country:
-                address.country || null,
+            properties?.country || null,
 
 
             city:
-                address.city ||
-                address.town ||
-                address.village ||
-                address.municipality ||
-                address.county ||
-                address.state ||
-                null
+            properties?.city ||
+            properties?.town ||
+            properties?.village ||
+            null
 
         };
 
@@ -58,7 +44,7 @@ const getLocationDetails = async (
     } catch(error){
 
         console.log(
-            "LOCATION ERROR:",
+            "GEOAPIFY ERROR:",
             error.message
         );
 
