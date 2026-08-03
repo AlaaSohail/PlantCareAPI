@@ -13,15 +13,15 @@ const register = async (req, res) => {
             email,
             password,
             confirmPassword,
-            phoneNumber,
+            phone_number,
             location,
-            userImage,
+            user_image,
             fcm_token
         } = req.body || {};
 
 
         // التحقق من البيانات
-        if (!name || !email || !password || !confirmPassword || !phoneNumber || !location) {
+        if (!name || !email || !password || !confirmPassword || !phone_number || !location) {
 
             return res.status(400).json({
                 success: false,
