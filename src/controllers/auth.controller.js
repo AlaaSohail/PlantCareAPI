@@ -15,7 +15,6 @@ const register = async (req, res) => {
             password,
             confirmPassword,
             phoneNumber,
-            location,
             userImage,
             latitude,
             longitude,
@@ -24,7 +23,16 @@ const register = async (req, res) => {
 
 
         // التحقق من البيانات
-        if (!name || !email || !password || !confirmPassword || !phoneNumber || !location) {
+        if (
+            !name ||
+            !email ||
+            !password ||
+            !confirmPassword ||
+            !phoneNumber ||
+            !userImage ||
+            !latitude ||
+            !longitude
+        ) {
 
             return res.status(400).json({
                 success: false,
@@ -94,9 +102,11 @@ const register = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 phoneNumber: user.phone_number,
-                location: user.location,
-                userImage: user.user_image
-
+                userImage: user.user_image,
+                latitude: user.latitude,
+                longitude: user.longitude,
+                country: user.country,
+                city: user.city
             }
 
         });
