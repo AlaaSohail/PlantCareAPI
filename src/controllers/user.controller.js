@@ -41,7 +41,10 @@ const profile = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                image: user.image
+                phoneNumber: user.phone_number,
+                location: user.location,
+                userImage: user.user_image,
+                
             }
 
         });
@@ -214,7 +217,7 @@ const deleteAccount = async (req, res) => {
             );
 
 
-       
+
 
 
         for (const plant of plants) {
@@ -227,7 +230,7 @@ const deleteAccount = async (req, res) => {
             if (plant.image_url) {
 
 
-              
+
 
 
                 await deleteImage(
@@ -252,7 +255,7 @@ const deleteAccount = async (req, res) => {
                 if (image.image_url) {
 
 
-                  
+
 
 
                     await deleteImage(

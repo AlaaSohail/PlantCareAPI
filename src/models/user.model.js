@@ -29,9 +29,9 @@ RETURNING *
                 data.name,
                 data.email,
                 data.password,
-                data.phoneNumber,
+                data.phone_number,
                 data.location,
-                data.userImage,
+                data.user_image,
                 data.fcm_token || null
             ]
 
