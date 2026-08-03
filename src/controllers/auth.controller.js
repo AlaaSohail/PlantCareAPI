@@ -202,8 +202,13 @@ const login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 phoneNumber: user.phone_number,
-                location: user.location,
-                userImage: user.user_image
+                userImage: user.user_image,
+
+                latitude: user.latitude,
+                longitude: user.longitude,
+
+                country: user.country,
+                city: user.city
             }
 
         });

@@ -274,6 +274,35 @@ WHERE email=$1
 
 
     }
+    static async updateLocation(id, data) {
+
+        const result =
+            await db.query(
+
+                `
+UPDATE users
+SET
+latitude=$1,
+longitude=$2,
+country=$3,
+city=$4
+WHERE id=$5
+RETURNING *
+`,
+                [
+                    data.latitude,
+                    data.longitude,
+                    data.country,
+                    data.city,
+                    id
+                ]
+
+            );
+
+
+        return result.rows[0];
+
+    }
 
 }
 

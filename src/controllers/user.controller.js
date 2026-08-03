@@ -10,7 +10,85 @@ const {
     deleteImage
 } = require("../services/cloudinary.service");
 
+const getLocationDetails =
+    require("../services/location.service");
 
+
+const updateLocation = async (req, res) => {
+
+    try {
+
+        const {
+            latitude,
+            longitude
+        } = req.body;
+
+
+        if (!latitude || !longitude) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Latitude and longitude are required"
+
+            });
+
+        }
+
+
+        const locationDetails =
+            await getLocationDetails(
+                latitude,
+                longitude
+            );
+
+
+        const user =
+            await User.updateLocation(
+                req.user.id,
+                {
+                    latitude,
+                    longitude,
+                    country:
+                        locationDetails.country,
+
+                    city:
+                        locationDetails.city
+                }
+            );
+
+
+        res.json({
+
+            success: true,
+
+            message: "Location updated successfully",
+
+            user
+
+        });
+
+
+    } catch (error) {
+
+        console.log(
+            "UPDATE LOCATION ERROR:",
+            error
+        );
+
+
+        res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
+
+};
 
 const profile = async (req, res) => {
 
@@ -476,6 +554,8 @@ module.exports = {
 
     deleteAccount,
 
-    changePassword
+    changePassword,
+
+    updateLocation
 
 };

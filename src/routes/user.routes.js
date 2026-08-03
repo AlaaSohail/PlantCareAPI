@@ -14,7 +14,8 @@ const {
     profile,
     getUsers,
     changePassword,
-    deleteAccount
+    deleteAccount,
+    updateLocation
 } = require("../controllers/user.controller");
 
 
@@ -57,6 +58,10 @@ router.get(
     getUsers
 );
 
-
+router.put(
+    "/location",
+    authMiddleware,
+    updateLocation
+);
 
 module.exports = router;
