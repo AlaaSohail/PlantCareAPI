@@ -54,9 +54,9 @@ const register = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            phoneNumber,
+            phone_number,
             location,
-            userImage,
+            user_image,
             fcm_token
         });
 
@@ -69,9 +69,9 @@ const register = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                phoneNumber: user.phoneNumber,
+                phoneNumber: user.phone_number,
                 location: user.location,
-                userImage: user.userImage
+                userImage: user.user_image
 
             }
 
@@ -167,9 +167,9 @@ const login = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                phoneNumber: user.phoneNumber,
+                phoneNumber: user.phone_number,
                 location: user.location,
-                userImage: user.userImage
+                userImage: user.user_image
             }
 
         });
