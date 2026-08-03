@@ -11,37 +11,43 @@ const getLocationDetails = async (
         const response = await axios.get(
             "https://api.geoapify.com/v1/geocode/reverse",
             {
-                params:{
+                params: {
                     lat: latitude,
                     lon: longitude,
                     apiKey:
-                    process.env.GEOAPIFY_KEY
+                        process.env.GEOAPIFY_KEY
                 }
             }
         );
 
 
         const properties =
-            response.data.features[0]
-            ?.properties;
+            response.data.features[0]?.properties;
+
+
+        console.log("GEOAPIFY PROPERTIES:", properties);
 
 
         return {
 
             country:
-            properties?.country || null,
+                properties?.country || null,
 
 
             city:
-            properties?.city ||
-            properties?.town ||
-            properties?.village ||
-            null
+                properties?.city ||
+                properties?.municipality ||
+                properties?.town ||
+                properties?.village ||
+                properties?.district ||
+                properties?.county ||
+                properties?.state ||
+                null
 
         };
 
 
-    } catch(error){
+    } catch (error) {
 
         console.log(
             "GEOAPIFY ERROR:",
@@ -50,8 +56,8 @@ const getLocationDetails = async (
 
 
         return {
-            country:null,
-            city:null
+            country: null,
+            city: null
         };
 
     }
