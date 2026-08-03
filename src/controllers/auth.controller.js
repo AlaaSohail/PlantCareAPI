@@ -5,7 +5,7 @@ const Token = require("../models/token.model");
 const sendResetEmail =
     require("../services/email.service");
 const register = async (req, res) => {
-
+    console.log("REGISTER BODY:", req.body);
     try {
 
         const {
@@ -13,15 +13,15 @@ const register = async (req, res) => {
             email,
             password,
             confirmPassword,
-            phone_number,
+            phoneNumber,
             location,
-            user_image,
+            userImage,
             fcm_token
         } = req.body || {};
 
 
         // التحقق من البيانات
-        if (!name || !email || !password || !confirmPassword || !phone_number || !location) {
+        if (!name || !email || !password || !confirmPassword || !phoneNumber || !location) {
 
             return res.status(400).json({
                 success: false,
@@ -51,13 +51,15 @@ const register = async (req, res) => {
 
 
         const user = await User.create({
+
             name,
             email,
             password: hashedPassword,
-            phone_number,
+            phoneNumber,
             location,
-            user_image,
+            userImage,
             fcm_token
+
         });
 
         res.status(201).json({

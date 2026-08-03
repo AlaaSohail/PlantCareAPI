@@ -29,10 +29,10 @@ RETURNING *
                 data.name,
                 data.email,
                 data.password,
-                data.phone_number,
+                data.phoneNumber,
                 data.location,
-                data.user_image,
-                data.fcm_token || null
+                data.userImage,
+                data.fcm_token
             ]
 
         );
