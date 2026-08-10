@@ -1,5 +1,5 @@
-const { body } = require("express-validator");
 
+const { body } = require("express-validator");
 
 const registerValidator = [
 
@@ -9,22 +9,19 @@ const registerValidator = [
         .isLength({ min: 3 })
         .withMessage("Name must be at least 3 characters"),
 
-
     body("email")
         .notEmpty()
         .withMessage("Email is required")
         .isEmail()
         .withMessage("Invalid email"),
 
-
     body("password")
         .notEmpty()
         .withMessage("Password is required")
-        .isLength({ min: 6 })
-        .withMessage("Password must be at least 6 characters")
+        .isLength({ min: 8 })
+        .withMessage("Password must be at least 8 characters")
 
 ];
-
 
 const loginValidator = [
 
@@ -34,12 +31,12 @@ const loginValidator = [
         .isEmail()
         .withMessage("Invalid email"),
 
-
     body("password")
         .notEmpty()
         .withMessage("Password is required")
 
 ];
+
 const forgotPasswordValidator = [
 
     body("email")
@@ -49,15 +46,26 @@ const forgotPasswordValidator = [
         .withMessage("Invalid email")
 
 ];
+
 const resetPasswordValidator = [
 
-    body("token")
+    body("email")
         .notEmpty()
-        .withMessage("Token is required"),
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Invalid email"),
+
+    body("code")
+        .notEmpty()
+        .withMessage("Reset code is required")
+        .isLength({ min: 6, max: 6 })
+        .withMessage("Reset code must be 6 digits"),
 
     body("password")
-        .isLength({min:6})
-        .withMessage("Password must be at least 6 characters")
+        .notEmpty()
+        .withMessage("Password is required")
+        .isLength({ min: 8 })
+        .withMessage("Password must be at least 8 characters")
 
 ];
 
@@ -67,3 +75,4 @@ module.exports = {
     forgotPasswordValidator,
     resetPasswordValidator
 };
+
