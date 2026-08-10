@@ -1,26 +1,34 @@
 const express = require("express");
 const router = express.Router();
 
-router.get("/test", (req, res) => {
+const authenticateToken =
+    require("../middleware/auth.middleware");
 
-    res.json({
-        success: true,
-        message: "Auth route working"
-    });
 
-});
-const authenticateToken = require("../middleware/auth.middleware");
-
+// =====================================================
+// CONTROLLERS
+// =====================================================
 
 const {
     register,
     login,
+    verifyEmail,
+    resendVerificationEmail,
     forgotPassword,
     resetPassword,
     logout,
-
 } = require("../controllers/auth.controller");
 
+
+// Google Login
+const {
+    googleLogin
+} = require("../controllers/social.controller");
+
+
+// =====================================================
+// VALIDATORS
+// =====================================================
 
 const {
     registerValidator,
@@ -29,11 +37,28 @@ const {
     resetPasswordValidator
 } = require("../validators/auth.validator");
 
+const validate =
+    require("../middleware/validation.middleware");
 
-const validate = require("../middleware/validation.middleware");
+
+// =====================================================
+// TEST
+// =====================================================
+
+router.get("/test", (req, res) => {
+
+    res.json({
+        success: true,
+        message: "Auth route working"
+    });
+
+});
 
 
-// Register
+// =====================================================
+// REGISTER
+// =====================================================
+
 router.post(
     "/register",
     registerValidator,
@@ -42,7 +67,10 @@ router.post(
 );
 
 
-// Login
+// =====================================================
+// LOGIN
+// =====================================================
+
 router.post(
     "/login",
     loginValidator,
@@ -51,7 +79,30 @@ router.post(
 );
 
 
-// Forgot Password
+// =====================================================
+// VERIFY EMAIL
+// =====================================================
+
+router.get(
+    "/verify-email",
+    verifyEmail
+);
+
+
+// =====================================================
+// RESEND VERIFICATION EMAIL
+// =====================================================
+
+router.post(
+    "/resend-verification",
+    resendVerificationEmail
+);
+
+
+// =====================================================
+// FORGOT PASSWORD
+// =====================================================
+
 router.post(
     "/forgot-password",
     forgotPasswordValidator,
@@ -60,7 +111,10 @@ router.post(
 );
 
 
-// Reset Password
+// =====================================================
+// RESET PASSWORD
+// =====================================================
+
 router.post(
     "/reset-password",
     resetPasswordValidator,
@@ -68,11 +122,21 @@ router.post(
     resetPassword
 );
 
-router.post("/logout", authenticateToken, logout);
 
-// Google Login
-const { googleLogin } = require("../controllers/social.controller");
+// =====================================================
+// LOGOUT
+// =====================================================
 
+router.post(
+    "/logout",
+    authenticateToken,
+    logout
+);
+
+
+// =====================================================
+// GOOGLE LOGIN
+// =====================================================
 
 router.post(
     "/google",

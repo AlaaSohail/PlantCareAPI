@@ -9,24 +9,42 @@ class User {
         const result = await db.query(
 
             `
-INSERT INTO users
-(
-name,
-email,
-password,
-phone_number,
-user_image,
-latitude,
-longitude,
-country,
-city,
-fcm_token
-)
+        INSERT INTO users
+        (
+            name,
+            email,
+            password,
+            phone_number,
+            user_image,
+            latitude,
+            longitude,
+            country,
+            city,
+            fcm_token,
+            email_verified,
+            email_verification_token,
+            email_verification_expires
+        )
 
-VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+        VALUES
+        (
+            $1,
+            $2,
+            $3,
+            $4,
+            $5,
+            $6,
+            $7,
+            $8,
+            $9,
+            $10,
+            $11,
+            $12,
+            $13
+        )
 
-RETURNING *
-`,
+        RETURNING *
+        `,
 
             [
                 data.name,
@@ -38,14 +56,18 @@ RETURNING *
                 data.longitude,
                 data.country,
                 data.city,
-                data.fcm_token
+                data.fcm_token || null,
+
+                data.emailVerified ?? false,
+
+                data.emailVerificationToken || null,
+
+                data.emailVerificationExpires || null
             ]
 
         );
 
-
         return result.rows[0];
-
     }
 
 
@@ -67,7 +89,75 @@ WHERE email=$1
 
     }
 
+    static async findByVerificationToken(token) {
 
+        const result = await db.query(
+
+            `
+        SELECT *
+        FROM users
+        WHERE email_verification_token = $1
+        `,
+
+            [token]
+
+        );
+
+        return result.rows[0];
+    }
+    static async verifyEmail(id) {
+
+        const result = await db.query(
+
+            `
+        UPDATE users
+
+        SET
+            email_verified = true,
+            email_verification_token = NULL,
+            email_verification_expires = NULL
+
+        WHERE id = $1
+
+        RETURNING *
+        `,
+
+            [id]
+
+        );
+
+        return result.rows[0];
+    }
+    static async updateVerificationToken(
+        id,
+        token,
+        expires
+    ) {
+
+        const result = await db.query(
+
+            `
+        UPDATE users
+
+        SET
+            email_verification_token = $1,
+            email_verification_expires = $2
+
+        WHERE id = $3
+
+        RETURNING *
+        `,
+
+            [
+                token,
+                expires,
+                id
+            ]
+
+        );
+
+        return result.rows[0];
+    }
     static async findById(id) {
 
         const result = await db.query(
