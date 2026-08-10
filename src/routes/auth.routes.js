@@ -17,6 +17,7 @@ const {
     forgotPassword,
     resetPassword,
     logout,
+    verifyResetCode
 } = require("../controllers/auth.controller");
 
 
@@ -98,7 +99,6 @@ router.post(
     resendVerificationEmail
 );
 
-
 // =====================================================
 // FORGOT PASSWORD
 // =====================================================
@@ -110,6 +110,14 @@ router.post(
     forgotPassword
 );
 
+// =====================================================
+// VERIFY RESET CODE
+// =====================================================
+
+router.post(
+    "/verify-reset-code",
+    verifyResetCode
+);
 
 // =====================================================
 // RESET PASSWORD
@@ -122,7 +130,6 @@ router.post(
     resetPassword
 );
 
-
 // =====================================================
 // LOGOUT
 // =====================================================
@@ -133,7 +140,6 @@ router.post(
     logout
 );
 
-
 // =====================================================
 // GOOGLE LOGIN
 // =====================================================
@@ -142,6 +148,5 @@ router.post(
     "/google",
     googleLogin
 );
-
 
 module.exports = router;

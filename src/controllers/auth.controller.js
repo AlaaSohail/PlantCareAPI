@@ -7,6 +7,7 @@ const Token = require("../models/token.model");
 
 const {
     sendResetEmail,
+    sendResetCodeEmail,
     sendVerificationEmail,
 } = require("../services/email.service");
 
@@ -912,70 +913,168 @@ const forgotPassword = async (req, res) => {
 
         const { email } = req.body;
 
+        if (!email) {
 
-        const user =
-            await User.findByEmail(email);
-
-
-        if (!user) {
-
-            return res.status(404).json({
-
+            return res.status(400).json({
                 success: false,
-
-                message:
-                    "Email not found"
-
+                message: "Email is required"
             });
 
         }
 
+        const normalizedEmail =
+            email.trim().toLowerCase();
 
-        const token =
-            crypto.randomBytes(32).toString("hex");
+        const user =
+            await User.findByEmail(normalizedEmail);
 
+        if (!user) {
 
-        const expire =
+            return res.status(404).json({
+                success: false,
+                message: "Email not found"
+            });
+
+        }
+
+        // ============================================
+        // Generate 6-digit reset code
+        // ============================================
+
+        const resetCode =
+            Math.floor(
+                100000 + Math.random() * 900000
+            ).toString();
+
+        // ============================================
+        // Code expires after 15 minutes
+        // ============================================
+
+        const resetCodeExpire =
             new Date(
-                Date.now() +
-                15 * 60 * 1000
+                Date.now() + 15 * 60 * 1000
             );
 
+        // ============================================
+        // Save code
+        // ============================================
 
-        await User.saveResetToken(
-
-            email,
-
-            token,
-
-            expire
-
+        await User.saveResetCode(
+            normalizedEmail,
+            resetCode,
+            resetCodeExpire
         );
 
+        // ============================================
+        // Send email
+        // ============================================
 
-        await sendResetEmail(
-
-            email,
-
-            token
-
+        await sendResetCodeEmail(
+            normalizedEmail,
+            user.name,
+            resetCode
         );
 
+        // ============================================
+        // Response
+        // ============================================
 
         return res.json({
 
             success: true,
 
             message:
-                "Reset email sent successfully"
+                "Password reset code sent successfully",
+
+            email: normalizedEmail
 
         });
-
 
     } catch (error) {
 
         console.log(
             "FORGOT PASSWORD ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Failed to send reset code"
+
+        });
+
+    }
+
+};
+
+const verifyResetCode = async (req, res) => {
+
+    try {
+
+        const {
+            email,
+            code
+        } = req.body;
+
+        if (!email || !code) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Email and code are required"
+
+            });
+
+        }
+
+        const normalizedEmail =
+            email.trim().toLowerCase();
+
+        // ============================================
+        // Find user using email + code
+        // ============================================
+
+        const user =
+            await User.findByResetCode(
+                normalizedEmail,
+                code
+            );
+
+        if (!user) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Invalid or expired verification code"
+
+            });
+
+        }
+
+        // ============================================
+        // Code is valid
+        // ============================================
+
+        return res.json({
+
+            success: true,
+
+            message:
+                "Verification code is valid"
+
+        });
+
+    } catch (error) {
+
+        console.log(
+            "VERIFY RESET CODE ERROR:",
             error
         );
 
@@ -991,27 +1090,54 @@ const forgotPassword = async (req, res) => {
     }
 
 };
-
-
 // =====================================================
 // RESET PASSWORD
 // =====================================================
+
 
 const resetPassword = async (req, res) => {
 
     try {
 
         const {
-            token,
+            email,
+            code,
             password
         } = req.body;
 
+        // ============================================
+        // Validate fields
+        // ============================================
+
+        if (!email || !code || !password) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Email, code and password are required"
+
+            });
+
+        }
+
+        // ============================================
+        // Normalize email
+        // ============================================
+
+        const normalizedEmail =
+            email.trim().toLowerCase();
+
+        // ============================================
+        // Find user using email + code
+        // ============================================
 
         const user =
-            await User.findByResetToken(
-                token
+            await User.findByResetCode(
+                normalizedEmail,
+                code
             );
-
 
         if (!user) {
 
@@ -1020,12 +1146,15 @@ const resetPassword = async (req, res) => {
                 success: false,
 
                 message:
-                    "Invalid token"
+                    "Invalid or expired reset code"
 
             });
 
         }
 
+        // ============================================
+        // Hash new password
+        // ============================================
 
         const hashedPassword =
             await bcrypt.hash(
@@ -1033,25 +1162,27 @@ const resetPassword = async (req, res) => {
                 10
             );
 
+        // ============================================
+        // Update password
+        // ============================================
 
         await User.updatePassword(
-
             user.id,
-
             hashedPassword
-
         );
 
+        // ============================================
+        // Response
+        // ============================================
 
         return res.json({
 
             success: true,
 
             message:
-                "Password updated"
+                "Password updated successfully"
 
         });
-
 
     } catch (error) {
 
@@ -1074,6 +1205,8 @@ const resetPassword = async (req, res) => {
 };
 
 
+
+
 // =====================================================
 // EXPORT
 // =====================================================
@@ -1092,6 +1225,8 @@ module.exports = {
 
     resetPassword,
 
-    logout
+    logout,
+
+    verifyResetCode
 
 };

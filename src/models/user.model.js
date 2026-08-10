@@ -175,55 +175,97 @@ WHERE email=$1
     }
 
 
-    static async saveResetToken(email, token, expire) {
+    static async saveResetCode(email, code, expire) {
 
         const result = await db.query(
             `
         UPDATE users
-        SET reset_token=$1,
-        reset_token_expire=$2
-        WHERE email=$3
+        SET
+            reset_code = $1,
+            reset_code_expire = $2
+        WHERE email = $3
         RETURNING *
         `,
             [
-                token,
+                code,
                 expire,
                 email
             ]
         );
 
         return result.rows[0];
-
     }
 
 
-    static async findByResetToken(token) {
+    static async findByResetCode(email, code) {
 
         const result = await db.query(
             `
         SELECT *
         FROM users
-        WHERE reset_token=$1
-        AND reset_token_expire > NOW()
+        WHERE email = $1
+        AND reset_code = $2
+        AND reset_code_expire > NOW()
         `,
-            [token]
+            [
+                email,
+                code
+            ]
         );
 
-
         return result.rows[0];
-
     }
 
+
+    static async clearResetCode(id) {
+
+        const result = await db.query(
+            `
+        UPDATE users
+        SET
+            reset_code = NULL,
+            reset_code_expire = NULL
+        WHERE id = $1
+        RETURNING *
+        `,
+            [id]
+        );
+
+        return result.rows[0];
+    }
+    static async createPasswordResetToken(id, token, expire) {
+
+        const result = await db.query(
+            `
+        UPDATE users
+        SET
+            reset_token = $1,
+            reset_token_expire = $2
+        WHERE id = $3
+        RETURNING *
+        `,
+            [
+                token,
+                expire,
+                id
+            ]
+        );
+
+        return result.rows[0];
+    }
 
     static async updatePassword(id, password) {
 
         const result = await db.query(
             `
         UPDATE users
-        SET password=$1,
-        reset_token=NULL,
-        reset_token_expire=NULL
-        WHERE id=$2
+        SET
+            password = $1,
+            reset_token = NULL,
+            reset_token_expire = NULL,
+            reset_code = NULL,
+            reset_code_expire = NULL
+        WHERE id = $2
         RETURNING *
         `,
             [
@@ -232,10 +274,11 @@ WHERE email=$1
             ]
         );
 
-
         return result.rows[0];
-
     }
+
+
+    
 
     static async findAll() {
 
