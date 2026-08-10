@@ -992,17 +992,13 @@ const forgotPassword = async (req, res) => {
 
     } catch (error) {
 
-        console.log(
-            "FORGOT PASSWORD ERROR:",
-            error
-        );
+        console.log("FORGOT PASSWORD ERROR:", error);
 
         return res.status(500).json({
 
             success: false,
 
-            message:
-                "Failed to send reset code"
+            message: error.message
 
         });
 
