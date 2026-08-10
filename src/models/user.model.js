@@ -90,17 +90,14 @@ WHERE email=$1
     }
 
     static async findByVerificationToken(token) {
-
         const result = await db.query(
-
             `
         SELECT *
         FROM users
         WHERE email_verification_token = $1
+        AND email_verification_expires > NOW()
         `,
-
             [token]
-
         );
 
         return result.rows[0];
@@ -308,44 +305,41 @@ WHERE email=$1
 
     static async updateProfile(id, data) {
 
-
         const result = await db.query(
-
             `
         UPDATE users
-
         SET
-        name=$1,
-        email=$2
-
-        WHERE id=$3
-
+            name = $1,
+            email = $2,
+            phone_number = $3,
+            location = $4,
+            user_image = $5
+        WHERE id = $6
         RETURNING
-        id,
-        name,
-        email,
-        role,
-        phone_number,
-        user_image,
-        location,
-        created_at
+            id,
+            name,
+            email,
+            role,
+            phone_number,
+            user_image,
+            location,
+            latitude,
+            longitude,
+            country,
+            city,
+            created_at
         `,
-
             [
+                data.name,
+                data.email,
                 data.phoneNumber,
                 data.location,
                 data.userImage,
-                data.name,
-                data.email,
-
                 id
             ]
-
         );
 
-
         return result.rows[0];
-
     }
 
     static async delete(id) {
