@@ -14,14 +14,25 @@ const validate =
     require("../middleware/validation.middleware");
 
 const {
-    loginLimiter,
+    loginEmailLimiter,
+    loginIpLimiter,
+
     registerLimiter,
     forgotPasswordLimiter,
     resendVerificationLimiter,
     verifyResetCodeLimiter,
     resetPasswordLimiter,
-    googleLoginLimiter
+    googleLoginLimiter,
+    facebookLoginLimiter
 } = require("../middleware/rateLimit.middleware");
+
+
+// =====================================================
+// LOGIN
+// =====================================================
+
+
+
 
 
 // =====================================================
@@ -40,7 +51,8 @@ const {
 } = require("../controllers/auth.controller");
 
 const {
-    googleLogin
+    googleLogin,
+    facebookLogin
 } = require("../controllers/social.controller");
 
 
@@ -89,7 +101,8 @@ router.post(
 
 router.post(
     "/login",
-    loginLimiter,
+    loginIpLimiter,
+    loginEmailLimiter,
     loginValidator,
     validate,
     login
@@ -174,6 +187,10 @@ router.post(
     googleLoginLimiter,
     googleLogin
 );
-
+router.post(
+    "/facebook",
+    facebookLoginLimiter,
+    facebookLogin
+);
 
 module.exports = router;

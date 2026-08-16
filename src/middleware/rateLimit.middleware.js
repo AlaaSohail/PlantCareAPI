@@ -1,23 +1,17 @@
 const rateLimit = require("express-rate-limit");
 
 
-// =====================================================
-// LOGIN
-// 5 attempts / 15 minutes per IP
-// =====================================================
-
-const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 5,
-
-    standardHeaders: "draft-8",
-    legacyHeaders: false,
-
-    message: {
-        success: false,
-        message: "Too many login attempts. Please try again later."
-    }
+/// ===================================================== // LOGIN - PER EMAIL // 5 attempts / 15 minutes per email //
+//  =====================================================
+const loginEmailLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, limit: 5, standardHeaders: "draft-8", legacyHeaders: false,
+    keyGenerator: (req) => {
+        const email = req.body?.email?.trim()?.toLowerCase();
+        if (!email) { return "unknown-email"; } return `login-email:${email}`;
+    }, message: { success: false, message: "Too many login attempts for this email. Please try again later." }
 });
+// ===================================================== // LOGIN - PER IP // 30 attempts / 15 minutes per IP ////  ===================================================== 
+const loginIpLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, standardHeaders: "draft-8", legacyHeaders: false, message: { success: false, message: "Too many login attempts from this network. Please try again later." } });
 
 
 // =====================================================
@@ -163,18 +157,41 @@ const aiLimiter = rateLimit({
     }
 });
 
+const facebookLoginLimiter = rateLimit({
+
+    windowMs: 15 * 60 * 1000,
+
+    limit: 10,
+
+    standardHeaders: "draft-8",
+
+    legacyHeaders: false,
+
+    message: {
+
+        success: false,
+
+        message:
+            "Too many Facebook login attempts. Please try again later."
+
+    }
+
+});
 
 // =====================================================
 // EXPORT
 // =====================================================
 
 module.exports = {
-    loginLimiter,
+    loginEmailLimiter, 
+    loginIpLimiter,
     registerLimiter,
     forgotPasswordLimiter,
     resendVerificationLimiter,
     verifyResetCodeLimiter,
     resetPasswordLimiter,
     googleLoginLimiter,
-    aiLimiter
+    aiLimiter,
+    facebookLoginLimiter
+    
 };

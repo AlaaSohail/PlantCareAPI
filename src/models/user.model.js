@@ -14,6 +14,7 @@ class User {
             name,
             email,
             password,
+            provider,
             phone_number,
             user_image,
             latitude,
@@ -23,7 +24,10 @@ class User {
             fcm_token,
             email_verified,
             email_verification_token,
-            email_verification_expires
+            email_verification_expires,
+            google_id,
+            apple_id,
+            facebook_id
         )
 
         VALUES
@@ -40,7 +44,11 @@ class User {
             $10,
             $11,
             $12,
-            $13
+            $13,
+            $14,
+            $15,
+            $16,
+            $17
         )
 
         RETURNING *
@@ -49,20 +57,28 @@ class User {
             [
                 data.name,
                 data.email,
-                data.password,
-                data.phoneNumber,
-                data.userImage,
-                data.latitude,
-                data.longitude,
-                data.country,
-                data.city,
-                data.fcm_token || null,
+                data.password ?? null,
+                data.provider ?? "local",
+
+                data.phoneNumber ?? null,
+                data.userImage ?? null,
+
+                data.latitude ?? null,
+                data.longitude ?? null,
+
+                data.country ?? null,
+                data.city ?? null,
+
+                data.fcm_token ?? null,
 
                 data.emailVerified ?? false,
 
-                data.emailVerificationToken || null,
+                data.emailVerificationToken ?? null,
+                data.emailVerificationExpires ?? null,
 
-                data.emailVerificationExpires || null
+                data.googleId ?? null,
+                data.appleId ?? null,
+                data.facebookId ?? null
             ]
 
         );
@@ -88,7 +104,74 @@ WHERE email=$1
         return result.rows[0];
 
     }
+static async findByGoogleId(googleId) {
 
+    const result = await db.query(
+        `
+        SELECT *
+        FROM users
+        WHERE google_id = $1
+        `,
+        [googleId]
+    );
+
+    return result.rows[0];
+}
+static async updateGoogleId(id, googleId) {
+
+    const result = await db.query(
+        `
+        UPDATE users
+        SET
+            google_id = $1,
+            provider = 'google',
+            email_verified = true
+        WHERE id = $2
+        RETURNING *
+        `,
+        [
+            googleId,
+            id
+        ]
+    );
+
+    return result.rows[0];
+}
+static async findByFacebookId(facebookId) {
+
+    const result = await db.query(
+        `
+        SELECT *
+        FROM users
+        WHERE facebook_id = $1
+        `,
+        [facebookId]
+    );
+
+    return result.rows[0];
+}
+
+
+static async updateFacebookId(id, facebookId) {
+
+    const result = await db.query(
+        `
+        UPDATE users
+        SET
+            facebook_id = $1,
+            provider = 'facebook',
+            email_verified = true
+        WHERE id = $2
+        RETURNING *
+        `,
+        [
+            facebookId,
+            id
+        ]
+    );
+
+    return result.rows[0];
+}
     static async findByVerificationToken(token) {
         const result = await db.query(
             `
@@ -278,7 +361,7 @@ WHERE email=$1
     }
 
 
-    
+
 
     static async findAll() {
 
