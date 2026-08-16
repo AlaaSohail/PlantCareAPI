@@ -44,11 +44,7 @@ const register = async (req, res) => {
             !name ||
             !email ||
             !password ||
-            !confirmPassword ||
-            !phoneNumber ||
-            !userImage ||
-            latitude === undefined ||
-            longitude === undefined
+            !confirmPassword
         ) {
 
             return res.status(400).json({
@@ -150,28 +146,20 @@ const register = async (req, res) => {
         // ============================================
 
         const user = await User.create({
-
             name,
-
             email: normalizedEmail,
-
             password: hashedPassword,
 
-            phoneNumber,
+            phoneNumber: phoneNumber || null,
+            userImage: userImage || null,
 
-            userImage,
+            latitude: latitude ?? null,
+            longitude: longitude ?? null,
 
-            latitude,
+            country: locationDetails?.country ?? null,
+            city: locationDetails?.city ?? null,
 
-            longitude,
-
-            country:
-                locationDetails.country,
-
-            city:
-                locationDetails.city,
-
-            fcm_token,
+            fcm_token: fcm_token || null,
 
             emailVerified: false,
 
@@ -180,7 +168,6 @@ const register = async (req, res) => {
 
             emailVerificationExpires:
                 verificationExpires
-
         });
 
 
