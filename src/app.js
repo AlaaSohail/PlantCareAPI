@@ -4,39 +4,62 @@ const cors = require("cors");
 const app = express();
 
 
-// Render Proxy
+// =====================================================
+// PROXY
+// =====================================================
+
+// Render / Cloudflare Proxy
 app.set("trust proxy", 1);
 
 
-// Middlewares
+// =====================================================
+// MIDDLEWARES
+// =====================================================
+
 app.use(cors());
+
 app.use(express.json());
 
+app.use(
+    express.urlencoded({
+        extended: true
+    })
+);
 
-// Static Files
+
+// =====================================================
+// STATIC FILES
+// =====================================================
+
 app.use(
     "/uploads",
     express.static("uploads")
 );
 
 
-// Home
+// =====================================================
+// HOME
+// =====================================================
+
 app.get("/", (req, res) => {
 
     res.json({
+        success: true,
         message: "PlantCare API Running"
     });
 
 });
 
 
+// =====================================================
+// ROUTES
+// =====================================================
+
 
 // =====================
-// Routes
+// AUTH
 // =====================
 
-
-// Auth
 const authRoutes =
     require("./routes/auth.routes");
 
@@ -46,7 +69,10 @@ app.use(
 );
 
 
-// Users
+// =====================
+// USERS
+// =====================
+
 const userRoutes =
     require("./routes/user.routes");
 
@@ -56,7 +82,10 @@ app.use(
 );
 
 
-// Plants
+// =====================
+// PLANTS
+// =====================
+
 const plantRoutes =
     require("./routes/plant.routes");
 
@@ -66,7 +95,10 @@ app.use(
 );
 
 
-// Care
+// =====================
+// CARE
+// =====================
+
 const careRoutes =
     require("./routes/care.routes");
 
@@ -76,7 +108,10 @@ app.use(
 );
 
 
-// Reminders
+// =====================
+// REMINDERS
+// =====================
+
 const reminderRoutes =
     require("./routes/reminder.routes");
 
@@ -86,7 +121,10 @@ app.use(
 );
 
 
-// AI Analysis
+// =====================
+// AI ANALYSIS
+// =====================
+
 const aiRoutes =
     require("./routes/ai.routes");
 
@@ -96,32 +134,36 @@ app.use(
 );
 
 
+// =====================================================
+// 404 HANDLER
+// =====================================================
 
-// 404 Handler
 app.use((req, res) => {
 
     res.status(404).json({
 
-        success:false,
+        success: false,
 
-        message:"Route not found"
+        message: "Route not found"
 
     });
 
 });
 
 
+// =====================================================
+// ERROR HANDLER
+// =====================================================
 
-// Error Handler
 app.use((err, req, res, next) => {
 
-    console.log(err);
+    console.error(err);
 
     res.status(500).json({
 
-        success:false,
+        success: false,
 
-        message:"Server error"
+        message: "Server error"
 
     });
 

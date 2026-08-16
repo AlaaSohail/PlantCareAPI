@@ -1,8 +1,27 @@
 const express = require("express");
+
 const router = express.Router();
+
+
+// =====================================================
+// MIDDLEWARE
+// =====================================================
 
 const authenticateToken =
     require("../middleware/auth.middleware");
+
+const validate =
+    require("../middleware/validation.middleware");
+
+const {
+    loginLimiter,
+    registerLimiter,
+    forgotPasswordLimiter,
+    resendVerificationLimiter,
+    verifyResetCodeLimiter,
+    resetPasswordLimiter,
+    googleLoginLimiter
+} = require("../middleware/rateLimit.middleware");
 
 
 // =====================================================
@@ -20,8 +39,6 @@ const {
     verifyResetCode
 } = require("../controllers/auth.controller");
 
-
-// Google Login
 const {
     googleLogin
 } = require("../controllers/social.controller");
@@ -37,9 +54,6 @@ const {
     forgotPasswordValidator,
     resetPasswordValidator
 } = require("../validators/auth.validator");
-
-const validate =
-    require("../middleware/validation.middleware");
 
 
 // =====================================================
@@ -62,6 +76,7 @@ router.get("/test", (req, res) => {
 
 router.post(
     "/register",
+    registerLimiter,
     registerValidator,
     validate,
     register
@@ -74,6 +89,7 @@ router.post(
 
 router.post(
     "/login",
+    loginLimiter,
     loginValidator,
     validate,
     login
@@ -96,8 +112,10 @@ router.get(
 
 router.post(
     "/resend-verification",
+    resendVerificationLimiter,
     resendVerificationEmail
 );
+
 
 // =====================================================
 // FORGOT PASSWORD
@@ -105,10 +123,12 @@ router.post(
 
 router.post(
     "/forgot-password",
+    forgotPasswordLimiter,
     forgotPasswordValidator,
     validate,
     forgotPassword
 );
+
 
 // =====================================================
 // VERIFY RESET CODE
@@ -116,8 +136,10 @@ router.post(
 
 router.post(
     "/verify-reset-code",
+    verifyResetCodeLimiter,
     verifyResetCode
 );
+
 
 // =====================================================
 // RESET PASSWORD
@@ -125,10 +147,12 @@ router.post(
 
 router.post(
     "/reset-password",
+    resetPasswordLimiter,
     resetPasswordValidator,
     validate,
     resetPassword
 );
+
 
 // =====================================================
 // LOGOUT
@@ -140,13 +164,16 @@ router.post(
     logout
 );
 
+
 // =====================================================
 // GOOGLE LOGIN
 // =====================================================
 
 router.post(
     "/google",
+    googleLoginLimiter,
     googleLogin
 );
+
 
 module.exports = router;

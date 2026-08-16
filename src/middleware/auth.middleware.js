@@ -34,7 +34,6 @@ const authMiddleware = (req, res, next) => {
         const token = parts[1];
 
 
-        console.log("TOKEN RECEIVED:", token);
 
 
         const decoded = jwt.verify(
@@ -43,7 +42,6 @@ const authMiddleware = (req, res, next) => {
         );
 
 
-        console.log("DECODED:", decoded);
 
 
         req.user = decoded;
