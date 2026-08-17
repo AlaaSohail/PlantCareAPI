@@ -48,25 +48,15 @@ const forgotPasswordValidator = [
 ];
 
 const resetPasswordValidator = [
-
-    body("email")
+    body("resetToken")
         .notEmpty()
-        .withMessage("Email is required")
-        .isEmail()
-        .withMessage("Invalid email"),
-
-    body("code")
-        .notEmpty()
-        .withMessage("Reset code is required")
-        .isLength({ min: 6, max: 6 })
-        .withMessage("Reset code must be 6 digits"),
+        .withMessage("Reset token is required"),
 
     body("password")
         .notEmpty()
         .withMessage("Password is required")
         .isLength({ min: 8 })
-        .withMessage("Password must be at least 8 characters")
-
+        .withMessage("Password must be at least 8 characters"),
 ];
 
 module.exports = {
