@@ -336,7 +336,20 @@ static async updateFacebookId(id, facebookId) {
 
         return result.rows[0];
     }
+static async findByResetToken(token) {
 
+    const result = await db.query(
+        `
+        SELECT *
+        FROM users
+        WHERE reset_token = $1
+        AND reset_token_expire > NOW()
+        `,
+        [token]
+    );
+
+    return result.rows[0];
+}
     static async updatePassword(id, password) {
 
         const result = await db.query(

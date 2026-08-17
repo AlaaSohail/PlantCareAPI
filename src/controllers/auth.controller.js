@@ -1005,12 +1005,8 @@ const verifyResetCode = async (req, res) => {
         if (!email || !code) {
 
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "Email and code are required"
-
+                message: "Email and code are required"
             });
 
         }
@@ -1019,7 +1015,7 @@ const verifyResetCode = async (req, res) => {
             email.trim().toLowerCase();
 
         // ============================================
-        // Find user using email + code
+        // Verify code
         // ============================================
 
         const user =
@@ -1031,18 +1027,37 @@ const verifyResetCode = async (req, res) => {
         if (!user) {
 
             return res.status(400).json({
-
                 success: false,
-
                 message:
                     "Invalid or expired verification code"
-
             });
 
         }
 
         // ============================================
-        // Code is valid
+        // Generate reset token
+        // ============================================
+
+        const resetToken =
+            crypto.randomBytes(32).toString("hex");
+
+        const resetTokenExpire =
+            new Date(
+                Date.now() + 10 * 60 * 1000
+            );
+
+        // ============================================
+        // Save reset token
+        // ============================================
+
+        await User.createPasswordResetToken(
+            user.id,
+            resetToken,
+            resetTokenExpire
+        );
+
+        // ============================================
+        // Response
         // ============================================
 
         return res.json({
@@ -1050,7 +1065,9 @@ const verifyResetCode = async (req, res) => {
             success: true,
 
             message:
-                "Verification code is valid"
+                "Verification code is valid",
+
+            resetToken
 
         });
 
@@ -1065,13 +1082,11 @@ const verifyResetCode = async (req, res) => {
 
             success: false,
 
-            message:
-                "Server error"
+            message: "Server error"
 
         });
 
     }
-
 };
 // =====================================================
 // RESET PASSWORD
@@ -1083,67 +1098,43 @@ const resetPassword = async (req, res) => {
     try {
 
         const {
-            email,
-            code,
+            resetToken,
             password
         } = req.body;
 
-        // ============================================
-        // Validate fields
-        // ============================================
-
-        if (!email || !code || !password) {
+        if (!resetToken || !password) {
 
             return res.status(400).json({
-
                 success: false,
-
                 message:
-                    "Email, code and password are required"
-
+                    "Reset token and password are required"
             });
 
         }
 
         // ============================================
-        // Normalize email
-        // ============================================
-
-        const normalizedEmail =
-            email.trim().toLowerCase();
-
-        // ============================================
-        // Find user using email + code
+        // Find user by reset token
         // ============================================
 
         const user =
-            await User.findByResetCode(
-                normalizedEmail,
-                code
-            );
+            await User.findByResetToken(resetToken);
 
         if (!user) {
 
             return res.status(400).json({
-
                 success: false,
-
                 message:
-                    "Invalid or expired reset code"
-
+                    "Invalid or expired reset token"
             });
 
         }
 
         // ============================================
-        // Hash new password
+        // Hash password
         // ============================================
 
         const hashedPassword =
-            await bcrypt.hash(
-                password,
-                10
-            );
+            await bcrypt.hash(password, 10);
 
         // ============================================
         // Update password
@@ -1153,10 +1144,6 @@ const resetPassword = async (req, res) => {
             user.id,
             hashedPassword
         );
-
-        // ============================================
-        // Response
-        // ============================================
 
         return res.json({
 
@@ -1178,15 +1165,12 @@ const resetPassword = async (req, res) => {
 
             success: false,
 
-            message:
-                "Server error"
+            message: "Server error"
 
         });
 
     }
-
 };
-
 
 
 
