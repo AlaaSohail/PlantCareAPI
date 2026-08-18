@@ -4,67 +4,46 @@ const db = require("../config/database");
 class Plant {
 
 
-    static async create(data) {
+ static async create(data) {
+    const {
+        user_id,
+        name,
+        species,
+        description,
+        image_url,
+        image_public_id
+    } = data;
 
-        const {
+    const result = await db.query(
+        `
+        INSERT INTO plants
+        (
             user_id,
             name,
             species,
-            image_url
-        } = data;
+            description,
+            image_url,
+            image_public_id
+        )
+        VALUES($1,$2,$3,$4,$5,$6)
+        RETURNING *
+        `,
+        [
+            user_id,
+            name,
+            species,
+            description,
+            image_url,
+            image_public_id
+        ]
+    );
 
-
-        const result = await db.query(
-
-            `
-            INSERT INTO plants
-            (
-                user_id,
-                name,
-                species,
-                image_url
-            )
-
-            VALUES($1,$2,$3,$4)
-
-            RETURNING *
-            `,
-
-            [
-                user_id,
-                name,
-                species,
-                image_url
-            ]
-
-        );
-
-
-        return result.rows[0];
-
-    }
+    return result.rows[0];
+}
 
 
 
-    static async findByUser(user_id) {
-
-        const result = await db.query(
-
-            `
-            SELECT *
-            FROM plants
-            WHERE user_id=$1
-            ORDER BY created_at DESC
-            `,
-
-            [user_id]
-
-        );
-
-
-        return result.rows;
-
-    }
+   
 
 
 
@@ -129,6 +108,7 @@ class Plant {
             p.name,
             p.species,
             p.image_url,
+            p.description,
             p.created_at,
 
 
@@ -186,75 +166,35 @@ class Plant {
         return result.rows[0];
 
     }
-    static async update(id, user_id, data) {
-
-
-        const result = await db.query(
-
-            `
-UPDATE plants
-
-SET
-name=$1,
-species=$2,
-image_url=$3
-
-WHERE id=$4
-AND user_id=$5
-
-RETURNING *
-
-`,
-
-            [
-                data.name,
-                data.species,
-                data.image_url,
-                id,
-                user_id
-            ]
-
-
-        );
-
-
-        return result.rows[0];
-
-    }
-    static async update(id, user_id, data) {
-
-
-        const result = await db.query(
-
-            `
+  static async update(id, user_id, data) {
+    const result = await db.query(
+        `
         UPDATE plants
-
         SET
-            name=$1,
-            species=$2,
-            image_url=$3
+            name = $1,
+            species = $2,
+            description = $3,
+            image_url = $4,
+            image_public_id = $5
 
-        WHERE id=$4
-        AND user_id=$5
+        WHERE id = $6
+        AND user_id = $7
 
         RETURNING *
-
         `,
+        [
+            data.name,
+            data.species,
+            data.description,
+            data.image_url,
+            data.image_public_id,
+            id,
+            user_id
+        ]
+    );
 
-            [
-                data.name,
-                data.species,
-                data.image_url,
-                id,
-                user_id
-            ]
-
-        );
-
-
-        return result.rows[0];
-
-    }
+    return result.rows[0];
+}
     static async findByUser(user_id) {
 
         const result = await db.query(

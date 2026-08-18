@@ -13,7 +13,8 @@ const createPlant = async (req, res) => {
         const {
             name,
             species,
-            image_url
+            image_url,
+            description
         } = req.body;
 
 
@@ -25,6 +26,7 @@ const createPlant = async (req, res) => {
             name,
 
             species,
+            description,
 
             image_url: req.file.path,
 
@@ -317,7 +319,8 @@ const updatePlant = async (req, res) => {
 
         const {
             name,
-            species
+            species,
+            description
         } = req.body;
 
 
@@ -393,6 +396,7 @@ const updatePlant = async (req, res) => {
                 {
                     name,
                     species,
+                    description,
                     image_url,
                     image_public_id
                 }
