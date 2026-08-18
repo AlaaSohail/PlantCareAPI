@@ -1,8 +1,10 @@
 const AIAnalysis =
     require("../models/ai.model");
 
-const analyzePlantImage =
-    require("../services/ai.service");
+const {
+    analyzePlantImage,
+    chatWithAI
+} = require("../services/ai.service");
 
 const Plant = require("../models/plant.model");
 const PlantHealth =
@@ -230,10 +232,86 @@ const getAnalysis = async (req, res) => {
     }
 
 };
+const chat = async (req, res) => {
 
+    try {
+
+        const {
+            message
+        } = req.body;
+
+
+        let imageUrl = null;
+
+
+        // الصورة اختيارية
+        if (req.file) {
+
+            imageUrl =
+                req.file.path;
+
+        }
+
+
+        // لازم يكون فيه نص أو صورة
+        if (
+            (!message || !message.trim()) &&
+            !imageUrl
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Message or image is required"
+
+            });
+
+        }
+
+
+        const reply =
+            await chatWithAI(
+                message,
+                imageUrl
+            );
+
+
+        res.json({
+
+            success: true,
+
+            message: reply
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.log(
+            "AI CHAT ERROR:",
+            error
+        );
+
+
+        res.status(500).json({
+
+            success: false,
+
+            message:
+                error.message
+
+        });
+
+    }
+
+};
 module.exports = {
 
     analyzePlant,
-    getAnalysis
+    getAnalysis,
+    chat
 
 };

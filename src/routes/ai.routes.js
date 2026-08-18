@@ -24,7 +24,8 @@ const {
 
 const {
     analyzePlant,
-    getAnalysis
+    getAnalysis,
+    chat
 } = require("../controllers/ai.controller");
 
 
@@ -50,6 +51,16 @@ router.get(
     authMiddleware,
     getAnalysis
 );
+// =====================================================
+// AI CHAT
+// =====================================================
 
+router.post(
+    "/ai/chat",
+    authMiddleware,
+    aiLimiter,
+    upload.single("image"),
+    chat
+);
 
 module.exports = router;
