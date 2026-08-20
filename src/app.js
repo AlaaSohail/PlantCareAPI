@@ -94,7 +94,9 @@ app.use(
     plantRoutes
 );
 
+const postRoutes = require("./routes/post.routes");
 
+app.use("/api/posts", postRoutes);
 // =====================
 // CARE
 // =====================
