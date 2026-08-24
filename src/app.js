@@ -135,6 +135,31 @@ app.use(
     aiRoutes
 );
 
+// =====================
+// POSTS
+// =====================
+
+const postRoutes =
+    require("./routes/post.routes");
+
+app.use(
+    "/api/posts",
+    postRoutes
+);
+
+
+// =====================
+// POST INTERACTIONS
+// =====================
+
+const postInteractionRoutes =
+    require("./routes/post_interaction.routes");
+
+app.use(
+    "/api",
+    postInteractionRoutes
+);
+
 
 // =====================================================
 // 404 HANDLER
@@ -170,12 +195,6 @@ app.use((err, req, res, next) => {
     });
 
 });
-const postInteractionRoutes =
-    require("./routes/post_interaction.routes");
 
-app.use(
-    "/api",
-    postInteractionRoutes
-);
 
 module.exports = app;
