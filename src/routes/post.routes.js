@@ -7,7 +7,8 @@ const authMiddleware =
 
 const upload =
     require("../middleware/upload.middleware");
-    const {
+
+const {
     toggleLike
 } = require("../controllers/post_interaction.controller");
 
@@ -19,6 +20,10 @@ const {
     deletePost
 } = require("../controllers/post.controller");
 
+
+// =====================================================
+// POSTS
+// =====================================================
 
 // Create Post
 router.post(
@@ -62,9 +67,15 @@ router.delete(
 );
 
 
+// =====================================================
+// LIKE
+// =====================================================
+
 router.post(
     "/:postId/like",
     authMiddleware,
     toggleLike
 );
+
+
 module.exports = router;

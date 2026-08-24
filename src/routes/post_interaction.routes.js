@@ -12,10 +12,6 @@ const {
 } = require("../controllers/post_interaction.controller");
 
 
-// =====================================================
-// COMMENTS
-// =====================================================
-
 // Add Comment
 router.post(
     "/posts/:postId/comments",
