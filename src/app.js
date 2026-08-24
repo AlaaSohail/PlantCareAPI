@@ -3,14 +3,11 @@ const cors = require("cors");
 
 const app = express();
 
-
 // =====================================================
 // PROXY
 // =====================================================
 
-// Render / Cloudflare Proxy
 app.set("trust proxy", 1);
-
 
 // =====================================================
 // MIDDLEWARES
@@ -22,10 +19,9 @@ app.use(express.json());
 
 app.use(
     express.urlencoded({
-        extended: true
+        extended: true,
     })
 );
-
 
 // =====================================================
 // STATIC FILES
@@ -36,121 +32,65 @@ app.use(
     express.static("uploads")
 );
 
-
 // =====================================================
 // HOME
 // =====================================================
 
 app.get("/", (req, res) => {
-
     res.json({
         success: true,
-        message: "PlantCare API Running"
+        message: "PlantCare API Running",
     });
-
 });
 
-
 // =====================================================
-// ROUTES
-// =====================================================
-
-
-// =====================
 // AUTH
-// =====================
+// =====================================================
 
-const authRoutes =
-    require("./routes/auth.routes");
+const authRoutes = require("./routes/auth.routes");
 
 app.use(
     "/api/auth",
     authRoutes
 );
 
-
-// =====================
+// =====================================================
 // USERS
-// =====================
+// =====================================================
 
-const userRoutes =
-    require("./routes/user.routes");
+const userRoutes = require("./routes/user.routes");
 
 app.use(
     "/api/users",
     userRoutes
 );
 
-
-// =====================
+// =====================================================
 // PLANTS
-// =====================
+// =====================================================
 
-const plantRoutes =
-    require("./routes/plant.routes");
+const plantRoutes = require("./routes/plant.routes");
 
 app.use(
     "/api/plants",
     plantRoutes
 );
 
-const postRoutes = require("./routes/post.routes");
-
-app.use("/api/posts", postRoutes);
-// =====================
-// CARE
-// =====================
-
-const careRoutes =
-    require("./routes/care.routes");
-
-app.use(
-    "/api",
-    careRoutes
-);
-
-
-// =====================
-// REMINDERS
-// =====================
-
-const reminderRoutes =
-    require("./routes/reminder.routes");
-
-app.use(
-    "/api",
-    reminderRoutes
-);
-
-
-// =====================
-// AI ANALYSIS
-// =====================
-
-const aiRoutes =
-    require("./routes/ai.routes");
-
-app.use(
-    "/api",
-    aiRoutes
-);
-
-// =====================
+// =====================================================
 // POSTS
-// =====================
+// =====================================================
 
-const postRoutes =
-    require("./routes/post.routes");
+const postRoutes = require("./routes/post.routes");
 
 app.use(
     "/api/posts",
     postRoutes
 );
 
-
-// =====================
+// =====================================================
 // POST INTERACTIONS
-// =====================
+// Like / Unlike / Comments
+// =====================================================
 
 const postInteractionRoutes =
     require("./routes/post_interaction.routes");
@@ -160,41 +100,69 @@ app.use(
     postInteractionRoutes
 );
 
+// =====================================================
+// CARE
+// =====================================================
+
+const careRoutes = require("./routes/care.routes");
+
+app.use(
+    "/api",
+    careRoutes
+);
+
+// =====================================================
+// REMINDERS
+// =====================================================
+
+const reminderRoutes =
+    require("./routes/reminder.routes");
+
+app.use(
+    "/api",
+    reminderRoutes
+);
+
+// =====================================================
+// AI ANALYSIS
+// =====================================================
+
+const aiRoutes =
+    require("./routes/ai.routes");
+
+app.use(
+    "/api",
+    aiRoutes
+);
 
 // =====================================================
 // 404 HANDLER
+// IMPORTANT: MUST BE LAST
 // =====================================================
 
 app.use((req, res) => {
-
     res.status(404).json({
-
         success: false,
-
-        message: "Route not found"
-
+        message: "Route not found",
     });
-
 });
-
 
 // =====================================================
 // ERROR HANDLER
+// IMPORTANT: MUST BE AFTER ALL ROUTES
 // =====================================================
 
 app.use((err, req, res, next) => {
-
     console.error(err);
 
     res.status(500).json({
-
         success: false,
-
-        message: "Server error"
-
+        message: "Server error",
     });
-
 });
 
+// =====================================================
+// EXPORT
+// =====================================================
 
 module.exports = app;
