@@ -35,32 +35,56 @@ class Post {
     }
 
 
-    // Get All Posts
-    static async findAll() {
+   // Get All Posts
+static async findAll(userId) {
 
-        const result = await db.query(
-            `
-            SELECT
-                posts.id,
-                posts.content,
-                posts.image_url,
-                posts.created_at,
+    const result = await db.query(
+        `
+        SELECT
+            posts.id,
+            posts.content,
+            posts.image_url,
+            posts.created_at,
 
-                users.id AS user_id,
-                users.name AS user_name,
-                users.user_image AS user_image
+            users.id AS user_id,
+            users.name AS user_name,
+            users.user_image AS user_image,
 
-            FROM posts
+            -- Likes count
+            (
+                SELECT COUNT(*)
+                FROM post_likes
+                WHERE post_likes.post_id = posts.id
+            ) AS likes_count,
 
-            INNER JOIN users
-                ON users.id = posts.user_id
+            -- Comments count
+            (
+                SELECT COUNT(*)
+                FROM post_comments
+                WHERE post_comments.post_id = posts.id
+            ) AS comments_count,
 
-            ORDER BY posts.created_at DESC
-            `
-        );
+            -- هل المستخدم الحالي عمل Like؟
+            EXISTS (
+                SELECT 1
+                FROM post_likes
+                WHERE post_likes.post_id = posts.id
+                AND post_likes.user_id = $1
+            ) AS liked_by_me
 
-        return result.rows;
-    }
+        FROM posts
+
+        INNER JOIN users
+            ON users.id = posts.user_id
+
+        ORDER BY posts.created_at DESC
+        `
+        ,
+        [userId]
+    );
+
+    return result.rows;
+}
 
 
     // Get One Post

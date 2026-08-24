@@ -86,8 +86,8 @@ const getPosts = async (req, res) => {
 
     try {
 
-        const posts =
-            await Post.findAll();
+               const posts = await Post.findAll(req.user.id);
+
 
 
         res.json({
