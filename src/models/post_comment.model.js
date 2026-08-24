@@ -2,6 +2,7 @@ const db = require("../config/database");
 
 class PostComment {
 
+    // Add Comment
     static async create(postId, userId, content) {
 
         const result = await db.query(
@@ -13,38 +14,47 @@ class PostComment {
                 content
             )
             VALUES
-            ($1, $2, $3)
+            (
+                $1,
+                $2,
+                $3
+            )
             RETURNING *
             `,
-            [postId, userId, content]
+            [
+                postId,
+                userId,
+                content
+            ]
         );
 
         return result.rows[0];
     }
 
 
+    // Get Comments
     static async findByPost(postId) {
 
         const result = await db.query(
             `
             SELECT
-                post_comments.id,
-                post_comments.post_id,
-                post_comments.user_id,
-                post_comments.content,
-                post_comments.created_at,
+                pc.id,
+                pc.post_id,
+                pc.user_id,
+                pc.content,
+                pc.created_at,
 
-                users.name AS user_name,
-                users.user_image
+                u.name AS user_name,
+                u.user_image
 
-            FROM post_comments
+            FROM post_comments pc
 
-            JOIN users
-                ON users.id = post_comments.user_id
+            JOIN users u
+                ON u.id = pc.user_id
 
-            WHERE post_comments.post_id = $1
+            WHERE pc.post_id = $1
 
-            ORDER BY post_comments.created_at ASC
+            ORDER BY pc.created_at ASC
             `,
             [postId]
         );
@@ -53,7 +63,8 @@ class PostComment {
     }
 
 
-    static async findById(id) {
+    // Find Comment
+    static async findById(commentId) {
 
         const result = await db.query(
             `
@@ -61,27 +72,34 @@ class PostComment {
             FROM post_comments
             WHERE id = $1
             `,
-            [id]
+            [commentId]
         );
 
         return result.rows[0];
     }
 
 
-    static async delete(id, userId) {
+    // Delete Comment
+    static async delete(commentId, userId) {
 
         const result = await db.query(
             `
             DELETE FROM post_comments
+
             WHERE id = $1
             AND user_id = $2
+
             RETURNING *
             `,
-            [id, userId]
+            [
+                commentId,
+                userId
+            ]
         );
 
         return result.rows[0];
     }
+
 }
 
 module.exports = PostComment;

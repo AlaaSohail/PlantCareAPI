@@ -6,28 +6,17 @@ const authMiddleware =
     require("../middleware/auth.middleware");
 
 const {
-    toggleLike,
     addComment,
     getComments,
     deleteComment
 } = require("../controllers/post_interaction.controller");
 
 
-// ========================
-// LIKE
-// ========================
-
-router.post(
-    "/posts/:postId/like",
-    authMiddleware,
-    toggleLike
-);
-
-
-// ========================
+// =====================================================
 // COMMENTS
-// ========================
+// =====================================================
 
+// Add Comment
 router.post(
     "/posts/:postId/comments",
     authMiddleware,
@@ -35,6 +24,7 @@ router.post(
 );
 
 
+// Get Comments
 router.get(
     "/posts/:postId/comments",
     authMiddleware,
@@ -42,6 +32,7 @@ router.get(
 );
 
 
+// Delete Comment
 router.delete(
     "/posts/:postId/comments/:commentId",
     authMiddleware,

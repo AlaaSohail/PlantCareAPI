@@ -1,89 +1,15 @@
-const db = require("../config/database");
-
-const PostLike = require("../models/post_like.model");
 const PostComment = require("../models/post_comment.model");
 
-const toggleLike = async (req, res) => {
 
-    try {
-
-        const postId = req.params.postId;
-        const userId = req.user.id;
-
-        // التأكد أن المنشور موجود
-        const post = await db.query(
-            `
-            SELECT id
-            FROM posts
-            WHERE id = $1
-            `,
-            [postId]
-        );
-
-        if (post.rows.length === 0) {
-
-            return res.status(404).json({
-                success: false,
-                message: "Post not found"
-            });
-
-        }
-
-        // هل المستخدم عامل Like؟
-        const existingLike =
-            await PostLike.findByUserAndPost(
-                userId,
-                postId
-            );
-
-        let liked;
-
-        if (existingLike) {
-
-            await PostLike.delete(
-                userId,
-                postId
-            );
-
-            liked = false;
-
-        } else {
-
-            await PostLike.create(
-                userId,
-                postId
-            );
-
-            liked = true;
-        }
-
-        const likesCount =
-            await PostLike.countByPost(postId);
-
-        res.json({
-            success: true,
-            liked,
-            likesCount
-        });
-
-    } catch (error) {
-
-        console.log(error);
-
-        res.status(500).json({
-            success: false,
-            message: "Server error"
-        });
-    }
-};
+// =====================================================
+// ADD COMMENT
+// =====================================================
 
 const addComment = async (req, res) => {
 
     try {
 
-        const postId = req.params.postId;
-        const userId = req.user.id;
-
+        const { postId } = req.params;
         const { content } = req.body;
 
         if (!content || content.trim().isEmpty) {
@@ -95,34 +21,18 @@ const addComment = async (req, res) => {
 
         }
 
-        const post = await db.query(
-            `
-            SELECT id
-            FROM posts
-            WHERE id = $1
-            `,
-            [postId]
+        const comment = await PostComment.create(
+            postId,
+            req.user.id,
+            content.trim()
         );
 
-        if (post.rows.length === 0) {
-
-            return res.status(404).json({
-                success: false,
-                message: "Post not found"
-            });
-
-        }
-
-        const comment =
-            await PostComment.create(
-                postId,
-                userId,
-                content.trim()
-            );
-
         res.status(201).json({
+
             success: true,
+
             comment
+
         });
 
     } catch (error) {
@@ -130,23 +40,37 @@ const addComment = async (req, res) => {
         console.log(error);
 
         res.status(500).json({
+
             success: false,
+
             message: "Server error"
+
         });
+
     }
+
 };
+
+
+// =====================================================
+// GET COMMENTS
+// =====================================================
+
 const getComments = async (req, res) => {
 
     try {
 
-        const postId = req.params.postId;
+        const { postId } = req.params;
 
         const comments =
             await PostComment.findByPost(postId);
 
         res.json({
+
             success: true,
+
             comments
+
         });
 
     } catch (error) {
@@ -154,35 +78,53 @@ const getComments = async (req, res) => {
         console.log(error);
 
         res.status(500).json({
+
             success: false,
+
             message: "Server error"
+
         });
+
     }
-}; const deleteComment = async (req, res) => {
+
+};
+
+
+// =====================================================
+// DELETE COMMENT
+// =====================================================
+
+const deleteComment = async (req, res) => {
 
     try {
 
-        const commentId = req.params.commentId;
-        const userId = req.user.id;
+        const { commentId } = req.params;
 
         const comment =
             await PostComment.delete(
                 commentId,
-                userId
+                req.user.id
             );
 
         if (!comment) {
 
             return res.status(403).json({
+
                 success: false,
-                message: "You are not allowed to delete this comment"
+
+                message:
+                    "You are not allowed to delete this comment"
+
             });
 
         }
 
         res.json({
+
             success: true,
+
             message: "Comment deleted successfully"
+
         });
 
     } catch (error) {
@@ -190,13 +132,22 @@ const getComments = async (req, res) => {
         console.log(error);
 
         res.status(500).json({
+
             success: false,
+
             message: "Server error"
+
         });
+
     }
-}; module.exports = {
-    toggleLike,
+
+};
+
+
+module.exports = {
+
     addComment,
     getComments,
     deleteComment
+
 };
