@@ -170,6 +170,12 @@ app.use((err, req, res, next) => {
     });
 
 });
+const postInteractionRoutes =
+    require("./routes/post_interaction.routes");
 
+app.use(
+    "/api",
+    postInteractionRoutes
+);
 
 module.exports = app;
