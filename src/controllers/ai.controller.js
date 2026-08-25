@@ -315,36 +315,26 @@ const analyzeNewPlant = async (req, res) => {
         if (!req.file) {
             return res.status(400).json({
                 success: false,
-                message: "Image required"
+                message: "Plant image is required"
             });
         }
 
+        // رابط الصورة بعد رفعها إلى Cloudinary
         const imageUrl = req.file.path;
 
-        // ==========================================
-        // Gemini - ONLY ONCE
-        // ==========================================
+        console.log("NEW PLANT IMAGE:", imageUrl);
 
+        // إرسال رابط الصورة إلى Gemini
         const aiResult =
-            await analyzePlantImage(
-                imageUrl
-            );
+            await analyzePlantImage(imageUrl);
 
-        // ==========================================
-        // Calculate Health Score
-        // ==========================================
+        console.log("AI RESULT:", aiResult);
 
+        // حساب نسبة صحة النبات
         const healthScore =
-            calculateHealthScore(
-                aiResult
-            );
-
-        // ==========================================
-        // Return temporary analysis
-        // ==========================================
+            calculateHealthScore(aiResult);
 
         return res.status(200).json({
-
             success: true,
 
             analysis: {
@@ -359,9 +349,7 @@ const analyzeNewPlant = async (req, res) => {
                     aiResult.disease,
 
                 confidence:
-                    Number(
-                        aiResult.confidence
-                    ),
+                    Number(aiResult.confidence),
 
                 recommendation:
                     aiResult.recommendation,
@@ -393,12 +381,15 @@ const analyzeNewPlant = async (req, res) => {
             error
         );
 
+        console.error(
+            "ERROR STACK:",
+            error.stack
+        );
+
         return res.status(500).json({
-
             success: false,
-
-            message: error.message
-
+            message: error.message,
+            stack: error.stack
         });
     }
 };
