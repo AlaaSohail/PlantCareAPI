@@ -308,10 +308,103 @@ const chat = async (req, res) => {
     }
 
 };
-module.exports = {
 
+const analyzeNewPlant = async (req, res) => {
+    try {
+
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "Image required"
+            });
+        }
+
+        const imageUrl = req.file.path;
+
+        // ==========================================
+        // Gemini - ONLY ONCE
+        // ==========================================
+
+        const aiResult =
+            await analyzePlantImage(
+                imageUrl
+            );
+
+        // ==========================================
+        // Calculate Health Score
+        // ==========================================
+
+        const healthScore =
+            calculateHealthScore(
+                aiResult
+            );
+
+        // ==========================================
+        // Return temporary analysis
+        // ==========================================
+
+        return res.status(200).json({
+
+            success: true,
+
+            analysis: {
+
+                image_url:
+                    imageUrl,
+
+                image_public_id:
+                    req.file.filename,
+
+                disease:
+                    aiResult.disease,
+
+                confidence:
+                    Number(
+                        aiResult.confidence
+                    ),
+
+                recommendation:
+                    aiResult.recommendation,
+
+                plant_name:
+                    aiResult.plant_name,
+
+                health_status:
+                    aiResult.health_status,
+
+                health_score:
+                    healthScore,
+
+                watering_advice:
+                    aiResult.watering_advice,
+
+                sunlight_advice:
+                    aiResult.sunlight_advice,
+
+                fertilizer_advice:
+                    aiResult.fertilizer_advice
+            }
+        });
+
+    } catch (error) {
+
+        console.error(
+            "ANALYZE NEW PLANT ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+    }
+};
+module.exports = {
     analyzePlant,
+    analyzeNewPlant,
     getAnalysis,
     chat
-
 };

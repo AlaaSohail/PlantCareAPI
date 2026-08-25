@@ -5,38 +5,156 @@ const Plant = require("../models/plant.model");
 // Create Plant
 
 const createPlant = async (req, res) => {
-
-
     try {
-
 
         const {
             name,
             species,
+            description,
             image_url,
-            description
+            image_public_id,
+            analysis
         } = req.body;
 
+        if (!image_url) {
+            return res.status(400).json({
+                success: false,
+                message: "Plant image is required"
+            });
+        }
 
+        // ==========================================
+        // Create Plant
+        // ==========================================
 
         const plant = await Plant.create({
 
-            user_id: req.user.id,
+            user_id:
+                req.user.id,
 
             name,
 
             species,
+
             description,
 
-            image_url: req.file.path,
+            image_url,
 
-            image_public_id: req.file.filename
-
+            image_public_id
         });
 
+        // ==========================================
+        // Save Analysis
+        // ==========================================
 
+        if (analysis) {
 
-        res.status(201).json({
+            const aiResult =
+                typeof analysis === "string"
+                    ? JSON.parse(analysis)
+                    : analysis;
+
+            const AIAnalysis =
+                require("../models/ai.model");
+
+            const PlantHealth =
+                require("../models/plantHealth.model");
+
+            const {
+                calculateHealthScore
+            } =
+                require("../services/health.service");
+
+            const CareTip =
+                require("../models/careTip.model");
+
+            const {
+                generateCareTips
+            } =
+                require("../services/care.service");
+
+            const savedAnalysis =
+                await AIAnalysis.create({
+
+                    plant_id:
+                        plant.id,
+
+                    image_url:
+                        aiResult.image_url,
+
+                    disease:
+                        aiResult.disease,
+
+                    confidence:
+                        Number(
+                            aiResult.confidence
+                        ),
+
+                    recommendation:
+                        aiResult.recommendation,
+
+                    plant_name:
+                        aiResult.plant_name,
+
+                    health_status:
+                        aiResult.health_status,
+
+                    watering_advice:
+                        aiResult.watering_advice,
+
+                    sunlight_advice:
+                        aiResult.sunlight_advice,
+
+                    fertilizer_advice:
+                        aiResult.fertilizer_advice
+                });
+
+            const healthScore =
+                aiResult.health_score ??
+                calculateHealthScore(
+                    aiResult
+                );
+
+            await PlantHealth.create({
+
+                plant_id:
+                    plant.id,
+
+                health_score:
+                    Number(healthScore),
+
+                health_status:
+                    aiResult.health_status,
+
+                last_analysis_id:
+                    savedAnalysis.id
+            });
+
+            const tips =
+                generateCareTips(
+                    aiResult
+                );
+
+            for (const tip of tips) {
+
+                await CareTip.create({
+
+                    plant_id:
+                        plant.id,
+
+                    type:
+                        tip.type,
+
+                    title:
+                        tip.title,
+
+                    description:
+                        tip.description
+                });
+            }
+        }
+
+        return res.status(201).json({
 
             success: true,
 
@@ -44,22 +162,21 @@ const createPlant = async (req, res) => {
 
         });
 
-
-
     } catch (error) {
 
-        console.log(error);
+        console.log(
+            "CREATE PLANT ERROR:",
+            error
+        );
 
-        res.status(500).json({
+        return res.status(500).json({
 
             success: false,
-            message: "Server error"
+
+            message: error.message
 
         });
-
     }
-
-
 };
 
 

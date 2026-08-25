@@ -24,15 +24,25 @@ const {
 
 const {
     analyzePlant,
+    analyzeNewPlant,
     getAnalysis,
     chat
 } = require("../controllers/ai.controller");
-
 
 // =====================================================
 // ANALYZE PLANT
 // =====================================================
 
+// NEW PLANT
+router.post(
+    "/plants/analyze",
+    authMiddleware,
+    aiLimiter,
+    upload.single("image"),
+    analyzeNewPlant
+);
+
+// EXISTING PLANT
 router.post(
     "/plants/:id/analyze",
     authMiddleware,
@@ -40,8 +50,6 @@ router.post(
     upload.single("image"),
     analyzePlant
 );
-
-
 // =====================================================
 // GET ANALYSIS
 // =====================================================
