@@ -102,6 +102,8 @@ const analyzePlant = async (req, res) => {
                 sunlight_advice: aiResult.sunlight_advice,
 
                 fertilizer_advice: aiResult.fertilizer_advice,
+                description: aiResult.description,
+                species: aiResult.species
 
             });
 

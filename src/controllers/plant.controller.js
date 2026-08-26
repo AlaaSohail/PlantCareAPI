@@ -108,7 +108,11 @@ const createPlant = async (req, res) => {
                         aiResult.sunlight_advice,
 
                     fertilizer_advice:
-                        aiResult.fertilizer_advice
+                        aiResult.fertilizer_advice,
+                    description:
+                        aiResult.description,
+                    species:
+                        aiResult.species
                 });
 
             const healthScore =

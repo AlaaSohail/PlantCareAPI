@@ -48,26 +48,38 @@ Return ONLY valid JSON.
 Do not use markdown.
 Do not add any text outside JSON.
 
+You MUST return ALL fields listed below.
+Never omit any field.
+Every field must have a value.
+If you cannot determine a value, use "Unknown" or "Not enough information".
+
 Use this exact format:
 
 {
   "plant_name": "",
+  "species": "",
   "health_status": "",
   "disease": "",
   "confidence": 0.0,
   "recommendation": "",
   "watering_advice": "",
   "sunlight_advice": "",
-  "fertilizer_advice": ""
+  "fertilizer_advice": "",
+  "description": ""
 }
 
 Rules:
-- Identify the plant name if possible.
+- Identify the common plant name if possible.
+- Identify the scientific species name if possible.
+- "species" must contain the scientific name, for example "Capsicum annuum".
+- "description" must contain a short description 15-20 words of the plant and its visible characteristics.
 - Determine if the plant is healthy or unhealthy.
 - Mention visible diseases or problems.
 - If there is no disease, use "None detected".
 - confidence must be a number between 0 and 1.
 - Give simple practical advice.
+- Never omit "description" or "species".
+- If you cannot determine something, use "Unknown".
 `
                         },
 
