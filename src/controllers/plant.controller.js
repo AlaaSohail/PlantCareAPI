@@ -7,16 +7,18 @@ const Plant = require("../models/plant.model");
 const createPlant = async (req, res) => {
     try {
 
-        const {
+           const {
             name,
             species,
             description,
-            image_url,
-            image_public_id,
             analysis
         } = req.body;
 
-        if (!image_url) {
+        // ==========================================
+        // Check Image
+        // ==========================================
+
+        if (!req.file) {
             return res.status(400).json({
                 success: false,
                 message: "Plant image is required"
@@ -24,22 +26,22 @@ const createPlant = async (req, res) => {
         }
 
         // ==========================================
+        // Cloudinary Image
+        // ==========================================
+
+        const image_url = req.file.path;
+        const image_public_id = req.file.filename;
+
+        // ==========================================
         // Create Plant
         // ==========================================
 
         const plant = await Plant.create({
-
-            user_id:
-                req.user.id,
-
+            user_id: req.user.id,
             name,
-
             species,
-
             description,
-
             image_url,
-
             image_public_id
         });
 
