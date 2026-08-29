@@ -7,10 +7,20 @@ const Plant = require("../models/plant.model");
 const createPlant = async (req, res) => {
     try {
 
-           const {
+        const {
             name,
             species,
             description,
+
+            health_status,
+            health_score,
+            watering_advice,
+            sunlight_advice,
+            fertilizer_advice,
+            disease,
+            confidence,
+            recommendation,
+
             analysis
         } = req.body;
 
@@ -42,7 +52,16 @@ const createPlant = async (req, res) => {
             species,
             description,
             image_url,
-            image_public_id
+            image_public_id,
+
+            health_status,
+            health_score,
+            watering_advice,
+            sunlight_advice,
+            fertilizer_advice,
+            disease,
+            confidence,
+            recommendation
         });
 
         // ==========================================
@@ -553,6 +572,69 @@ const updatePlant = async (req, res) => {
     }
 
 };
+const updatePlantAI = async (req, res) => {
+
+    try {
+
+        const {
+            health_status,
+            health_score,
+            watering_advice,
+            sunlight_advice,
+            fertilizer_advice,
+            disease,
+            confidence,
+            recommendation
+        } = req.body;
+
+        const plant = await Plant.findById(
+            req.params.id,
+            req.user.id
+        );
+
+        if (!plant) {
+
+            return res.status(404).json({
+                success: false,
+                message: "Plant not found"
+            });
+
+        }
+
+        const updatedPlant =
+            await Plant.updateAiData(
+                req.params.id,
+                req.user.id,
+                {
+                    health_status,
+                    health_score,
+                    watering_advice,
+                    sunlight_advice,
+                    fertilizer_advice,
+                    disease,
+                    confidence,
+                    recommendation
+                }
+            );
+
+        return res.json({
+            success: true,
+            plant: updatedPlant
+        });
+
+    } catch (error) {
+
+        console.log(
+            "UPDATE PLANT AI ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
 
 module.exports = {
 
@@ -561,6 +643,7 @@ module.exports = {
     getPlant,
     deletePlant,
     getPlantDetails,
-    updatePlant
+    updatePlant,
+    updatePlantAI
 
 };

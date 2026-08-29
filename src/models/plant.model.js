@@ -25,7 +25,7 @@ class Plant {
             image_url,
             image_public_id
         )
-        VALUES($1,$2,$3,$4,$5,$6)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *
         `,
         [
@@ -40,7 +40,6 @@ class Plant {
 
     return result.rows[0];
 }
-
 
 
    
@@ -214,6 +213,51 @@ WHERE user_id=$1
         return result.rows;
 
     }
+    static async updateAiData(plantId, userId, data) {
+
+    const {
+        health_status,
+        health_score,
+        watering_advice,
+        sunlight_advice,
+        fertilizer_advice,
+        disease,
+        confidence,
+        recommendation
+    } = data;
+
+    const result = await db.query(
+        `
+        UPDATE plants
+        SET
+            health_status = $1,
+            health_score = $2,
+            watering_advice = $3,
+            sunlight_advice = $4,
+            fertilizer_advice = $5,
+            disease = $6,
+            confidence = $7,
+            recommendation = $8
+        WHERE id = $9
+          AND user_id = $10
+        RETURNING *
+        `,
+        [
+            health_status,
+            health_score,
+            watering_advice,
+            sunlight_advice,
+            fertilizer_advice,
+            disease,
+            confidence,
+            recommendation,
+            plantId,
+            userId
+        ]
+    );
+
+    return result.rows[0];
+}
 }
 
 

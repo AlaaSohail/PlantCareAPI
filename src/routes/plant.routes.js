@@ -17,7 +17,8 @@ const {
     getPlant,
     deletePlant,
     getPlantDetails,
-    updatePlant
+    updatePlant,
+    updatePlantAI
 
 } = require("../controllers/plant.controller");
 
@@ -73,7 +74,11 @@ router.put(
     upload.single("image"),
     updatePlant
 );
-
+router.put(
+    '/:id/analysis',
+    authMiddleware,
+    updatePlantAI
+);
 
 
 module.exports = router;
