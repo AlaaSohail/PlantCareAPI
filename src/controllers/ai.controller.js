@@ -314,25 +314,13 @@ const analyzeNewPlant = async (req, res) => {
     try {
 
         if (!req.file) {
-            console.log("===== ANALYZE NEW PLANT =====");
-            console.log("Original name:", req.file.originalname);
-            console.log("Mimetype:", req.file.mimetype);
-            console.log("Size:", req.file.size);
-            console.log("Has buffer:", !!req.file.buffer);
-            console.log("Path:", req.file.path);
-            console.log("=============================");
+
             return res.status(400).json({
                 success: false,
                 message: "Plant image is required"
             });
         }
-        console.log("===== ANALYZE NEW PLANT =====");
-        console.log("Original name:", req.file.originalname);
-        console.log("Mimetype:", req.file.mimetype);
-        console.log("Size:", req.file.size);
-        console.log("Has buffer:", !!req.file.buffer);
-        console.log("Path:", req.file.path);
-        console.log("=============================");
+
 
         // الصورة موجودة في الذاكرة فقط
         const imageBuffer = req.file.buffer;
