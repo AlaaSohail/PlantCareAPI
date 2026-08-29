@@ -5,13 +5,23 @@ class Plant {
 
 
  static async create(data) {
+
     const {
         user_id,
         name,
         species,
         description,
         image_url,
-        image_public_id
+        image_public_id,
+
+        health_status,
+        health_score,
+        watering_advice,
+        sunlight_advice,
+        fertilizer_advice,
+        disease,
+        confidence,
+        recommendation
     } = data;
 
     const result = await db.query(
@@ -23,9 +33,20 @@ class Plant {
             species,
             description,
             image_url,
-            image_public_id
+            image_public_id,
+            health_status,
+            health_score,
+            watering_advice,
+            sunlight_advice,
+            fertilizer_advice,
+            disease,
+            confidence,
+            recommendation
         )
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES (
+            $1,$2,$3,$4,$5,$6,
+            $7,$8,$9,$10,$11,$12,$13,$14
+        )
         RETURNING *
         `,
         [
@@ -34,13 +55,21 @@ class Plant {
             species,
             description,
             image_url,
-            image_public_id
+            image_public_id,
+
+            health_status,
+            health_score,
+            watering_advice,
+            sunlight_advice,
+            fertilizer_advice,
+            disease,
+            confidence,
+            recommendation
         ]
     );
 
     return result.rows[0];
 }
-
 
    
 

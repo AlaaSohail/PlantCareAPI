@@ -66,15 +66,14 @@ const createPlant = async (req, res) => {
             image_public_id,
 
             health_status,
-            health_score,
+            health_score: Number(health_score),
             watering_advice,
             sunlight_advice,
             fertilizer_advice,
             disease,
-            confidence,
+            confidence: Number(confidence),
             recommendation
         });
-
         // ==========================================
         // Save Analysis
         // ==========================================
