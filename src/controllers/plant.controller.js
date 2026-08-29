@@ -23,18 +23,7 @@ const createPlant = async (req, res) => {
 
             analysis
         } = req.body;
-        console.log("===== CREATE PLANT BODY =====");
-        console.log(req.body);
-        console.log("=============================");
 
-        console.log("health_status:", req.body.health_status);
-        console.log("health_score:", req.body.health_score);
-        console.log("watering_advice:", req.body.watering_advice);
-        console.log("sunlight_advice:", req.body.sunlight_advice);
-        console.log("fertilizer_advice:", req.body.fertilizer_advice);
-        console.log("disease:", req.body.disease);
-        console.log("confidence:", req.body.confidence);
-        console.log("recommendation:", req.body.recommendation);
         // ==========================================
         // Check Image
         // ==========================================

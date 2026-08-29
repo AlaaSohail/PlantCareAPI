@@ -10,19 +10,36 @@ const client = new OpenAI({
 // PLANT IMAGE ANALYSIS
 // =====================================================
 
-const analyzePlantImage = async (imageUrl) => {
+const analyzePlantImage = async (imageInput, contentType = "image/jpeg") => {
 
-    const imageBuffer =
-        await axios.get(
-            imageUrl,
-            {
-                responseType: "arraybuffer"
-            }
-        );
+    let imageBase64;
+    let mimeType = contentType;
 
-    const imageBase64 =
-        Buffer.from(imageBuffer.data)
-            .toString("base64");
+    // إذا كان المدخل Buffer
+    if (Buffer.isBuffer(imageInput)) {
+
+        imageBase64 =
+            imageInput.toString("base64");
+
+    } else {
+
+        // إذا كان URL
+        const imageBuffer =
+            await axios.get(
+                imageInput,
+                {
+                    responseType: "arraybuffer"
+                }
+            );
+
+        imageBase64 =
+            Buffer.from(imageBuffer.data)
+                .toString("base64");
+
+        mimeType =
+            imageBuffer.headers["content-type"] ||
+            "image/jpeg";
+    }
 
     const response =
         await client.responses.create({
@@ -71,7 +88,7 @@ Use this exact format:
 Rules:
 - Identify the common plant name if possible.
 - Identify the scientific species name if possible.
-- "species" must contain the scientific name, for example "Capsicum annuum".
+- "species" must contain the scientific name.
 - "description" must contain a short description 15-20 words of the plant and its visible characteristics.
 - Determine if the plant is healthy or unhealthy.
 - Mention visible diseases or problems.
@@ -87,21 +104,24 @@ Rules:
                             type: "input_image",
 
                             image_url:
-                                `data:${imageBuffer.headers["content-type"]};base64,${imageBase64}`
+                                `data:${mimeType};base64,${imageBase64}`
                         }
 
                     ]
                 }
+
             ]
+
         });
 
     let result;
 
     try {
 
-        result = JSON.parse(
-            response.output_text
-        );
+        result =
+            JSON.parse(
+                response.output_text
+            );
 
     } catch (error) {
 

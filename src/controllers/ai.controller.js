@@ -64,17 +64,15 @@ const analyzePlant = async (req, res) => {
 
 
 
-        const imageUrl =
-            req.file.path;
+        const imageBuffer = req.file.buffer;
 
+        const contentType = req.file.mimetype;
 
-
-        // إرسال الصورة إلى Gemini
         const aiResult =
             await analyzePlantImage(
-                imageUrl
+                imageBuffer,
+                contentType
             );
-
 
 
 
@@ -312,40 +310,52 @@ const chat = async (req, res) => {
 };
 
 const analyzeNewPlant = async (req, res) => {
+
     try {
 
         if (!req.file) {
+            console.log("===== ANALYZE NEW PLANT =====");
+            console.log("Original name:", req.file.originalname);
+            console.log("Mimetype:", req.file.mimetype);
+            console.log("Size:", req.file.size);
+            console.log("Has buffer:", !!req.file.buffer);
+            console.log("Path:", req.file.path);
+            console.log("=============================");
             return res.status(400).json({
                 success: false,
                 message: "Plant image is required"
             });
         }
+        console.log("===== ANALYZE NEW PLANT =====");
+        console.log("Original name:", req.file.originalname);
+        console.log("Mimetype:", req.file.mimetype);
+        console.log("Size:", req.file.size);
+        console.log("Has buffer:", !!req.file.buffer);
+        console.log("Path:", req.file.path);
+        console.log("=============================");
 
-        // رابط الصورة بعد رفعها إلى Cloudinary
-        const imageUrl = req.file.path;
+        // الصورة موجودة في الذاكرة فقط
+        const imageBuffer = req.file.buffer;
 
-        console.log("NEW PLANT IMAGE:", imageUrl);
+        const contentType = req.file.mimetype;
 
-        // إرسال رابط الصورة إلى Gemini
+        // إرسال الصورة مباشرة إلى AI
         const aiResult =
-            await analyzePlantImage(imageUrl);
+            await analyzePlantImage(
+                imageBuffer,
+                contentType
+            );
 
         console.log("AI RESULT:", aiResult);
 
-        // حساب نسبة صحة النبات
         const healthScore =
             calculateHealthScore(aiResult);
 
         return res.status(200).json({
+
             success: true,
 
             analysis: {
-
-                image_url:
-                    imageUrl,
-
-                image_public_id:
-                    req.file.filename,
 
                 disease:
                     aiResult.disease,
@@ -379,7 +389,6 @@ const analyzeNewPlant = async (req, res) => {
 
                 species:
                     aiResult.species
-
             }
         });
 
@@ -390,15 +399,9 @@ const analyzeNewPlant = async (req, res) => {
             error
         );
 
-        console.error(
-            "ERROR STACK:",
-            error.stack
-        );
-
         return res.status(500).json({
             success: false,
-            message: error.message,
-            stack: error.stack
+            message: error.message
         });
     }
 };

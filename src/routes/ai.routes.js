@@ -10,6 +10,9 @@ const router = express.Router();
 const upload =
     require("../middleware/upload.middleware");
 
+const analyzeUpload =
+    require("../middleware/analyzeUpload.middleware");
+
 const authMiddleware =
     require("../middleware/auth.middleware");
 
@@ -29,20 +32,22 @@ const {
     chat
 } = require("../controllers/ai.controller");
 
+
 // =====================================================
 // ANALYZE PLANT
 // =====================================================
 
-// NEW PLANT
+// NEW PLANT - بدون Cloudinary
 router.post(
     "/plants/analyze",
     authMiddleware,
     aiLimiter,
-    upload.single("image"),
+    analyzeUpload.single("image"),
     analyzeNewPlant
 );
 
-// EXISTING PLANT
+
+// EXISTING PLANT - Cloudinary حاليًا
 router.post(
     "/plants/:id/analyze",
     authMiddleware,
@@ -50,6 +55,8 @@ router.post(
     upload.single("image"),
     analyzePlant
 );
+
+
 // =====================================================
 // GET ANALYSIS
 // =====================================================
@@ -59,6 +66,8 @@ router.get(
     authMiddleware,
     getAnalysis
 );
+
+
 // =====================================================
 // AI CHAT
 // =====================================================
