@@ -1,4 +1,5 @@
 const express = require("express");
+const multer = require("multer");
 
 const router = express.Router();
 
@@ -19,12 +20,17 @@ const {
 } = require("../controllers/user.controller");
 
 
+// Multer
+const upload = multer({
+    storage: multer.memoryStorage()
+});
+
+
 router.delete(
     "/account",
     authMiddleware,
     deleteAccount
 );
-
 
 
 router.get(
@@ -34,13 +40,12 @@ router.get(
 );
 
 
-
 router.put(
     "/profile",
     authMiddleware,
+    upload.single("image"),
     updateProfile
 );
-
 
 
 router.put(
@@ -50,7 +55,6 @@ router.put(
 );
 
 
-
 router.get(
     "/all",
     authMiddleware,
@@ -58,10 +62,12 @@ router.get(
     getUsers
 );
 
+
 router.put(
     "/location",
     authMiddleware,
     updateLocation
 );
+
 
 module.exports = router;
