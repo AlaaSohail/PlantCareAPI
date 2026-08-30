@@ -7,7 +7,8 @@ const AIAnalysis =
 
 
 const {
-    deleteImage
+    deleteImage,
+    uploadImage
 } = require("../services/cloudinary.service");
 
 const getLocationDetails =
@@ -241,56 +242,175 @@ const getUsers = async (req, res) => {
 
 
 const updateProfile = async (req, res) => {
-
     try {
-
 
         const {
             name,
-            email
+            email,
+            phoneNumber,
+            location
         } = req.body;
 
 
+        const user = await User.findById(
+            req.user.id
+        );
 
-        const user =
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+
+        // الاحتفاظ بالقيم القديمة إذا لم يتم إرسالها
+        const updatedName =
+            name !== undefined
+                ? name.trim()
+                : user.name;
+
+
+        const updatedEmail =
+            email !== undefined
+                ? email.trim().toLowerCase()
+                : user.email;
+
+
+        const updatedPhone =
+            phoneNumber !== undefined
+                ? phoneNumber.trim()
+                : user.phone_number;
+
+
+        const updatedLocation =
+            location !== undefined
+                ? location
+                : user.location;
+
+
+        let updatedImage =
+            user.user_image;
+
+
+        // إذا تم اختيار صورة جديدة
+        if (req.file) {
+
+            // رفع الصورة الجديدة
+            const uploadedImage =
+                await uploadImage(
+                    req.file.buffer
+                );
+
+
+            updatedImage =
+                uploadedImage.secure_url;
+
+
+            // حذف الصورة القديمة
+            if (user.user_image) {
+
+                await deleteImage(
+                    user.user_image
+                );
+
+            }
+
+        }
+
+
+        // تحديث قاعدة البيانات
+        const updatedUser =
             await User.updateProfile(
                 req.user.id,
                 {
-                    name,
-                    email
+                    name: updatedName,
+                    email: updatedEmail,
+                    phoneNumber: updatedPhone,
+                    location: updatedLocation,
+                    userImage: updatedImage
                 }
             );
-
 
 
         res.json({
 
             success: true,
 
-            user
+            message:
+                "Profile updated successfully",
+
+            user: {
+
+                id:
+                    updatedUser.id,
+
+                name:
+                    updatedUser.name,
+
+                email:
+                    updatedUser.email,
+
+                phoneNumber:
+                    updatedUser.phone_number,
+
+                userImage:
+                    updatedUser.user_image,
+
+                location:
+                    updatedUser.location,
+
+                latitude:
+                    updatedUser.latitude,
+
+                longitude:
+                    updatedUser.longitude,
+
+                country:
+                    updatedUser.country,
+
+                city:
+                    updatedUser.city
+            }
 
         });
 
 
-
     } catch (error) {
 
+        console.log(
+            "UPDATE PROFILE ERROR:",
+            error
+        );
 
-        console.log(error);
+
+        // Duplicate email
+        if (error.code === "23505") {
+
+            return res.status(409).json({
+
+                success: false,
+
+                message:
+                    "Email is already in use"
+
+            });
+
+        }
 
 
         res.status(500).json({
 
             success: false,
 
-            message: error.message
+            message:
+                error.message
 
         });
 
     }
-
 };
-
 
 
 
@@ -492,7 +612,12 @@ const changePassword = async (req, res) => {
 
         }
 
-
+        if (newPassword.length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: "New password must be at least 8 characters"
+            });
+        }
 
         const hashedPassword =
             await bcrypt.hash(
@@ -556,6 +681,7 @@ module.exports = {
 
     changePassword,
 
-    updateLocation
+    updateLocation,
+
 
 };
