@@ -239,7 +239,7 @@ const updateTaskSchedule = async (req, res) => {
         if (!Number.isInteger(taskId) || taskId <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid task id",
+                message: "Invalid task id ",
             });
         }
 
@@ -322,7 +322,7 @@ const deleteTaskSchedule = async (req, res) => {
         if (!Number.isInteger(taskId) || taskId <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid task id",
+                message: "Invalid task id ",
             });
         }
 

@@ -592,7 +592,7 @@ const login = async (req, res) => {
                 success: false,
 
                 message:
-                    "Invalid password"
+                    "Invalid password or email"
 
             });
 
@@ -881,7 +881,7 @@ const logout = async (req, res) => {
             success: false,
 
             message:
-                "Invalid token"
+                "Invalid token or already logged out"
 
         });
 

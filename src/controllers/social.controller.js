@@ -78,7 +78,7 @@ const googleLogin = async (req, res) => {
 
                 success: false,
 
-                message: "Invalid Google account"
+                message: "Invalid Google account information"
 
             });
 
@@ -368,7 +368,7 @@ const facebookLogin = async (req, res) => {
                 success: false,
 
                 message:
-                    "Invalid Facebook token"
+                    "Invalid Facebook token or token has expired"
 
             });
 
