@@ -134,7 +134,17 @@ app.use(
     "/api",
     aiRoutes
 );
+// =====================================================
+// TASKS
+// =====================================================
 
+const taskRoutes =
+    require("./routes/task.routes");
+
+app.use(
+    "/api/tasks",
+    taskRoutes
+);
 // =====================================================
 // 404 HANDLER
 // IMPORTANT: MUST BE LAST

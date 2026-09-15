@@ -4,7 +4,7 @@ const db = require("../config/database");
 class Care {
 
 
-    static async create(data){
+    static async create(data, client = db){
 
         const {
             plant_id,
@@ -13,7 +13,7 @@ class Care {
         } = data;
 
 
-        const result = await db.query(
+        const result = await client.query(
 
             `
             INSERT INTO plant_care_logs
