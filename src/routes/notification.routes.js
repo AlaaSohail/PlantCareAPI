@@ -3,21 +3,16 @@ const express = require("express");
 const router = express.Router();
 
 const authMiddleware =
-    require("../middleware/auth.middleware");
-
+  require("../middleware/auth.middleware");
 
 const {
-    getNotifications
-}
-    =
-    require("../controllers/notification.controller");
+  sendTestNotification,
+} = require("../controllers/notification.controller");
 
-
-router.get(
-    "/",
-    authMiddleware,
-    getNotifications
+router.post(
+  "/test",
+  authMiddleware,
+  sendTestNotification
 );
-
 
 module.exports = router;

@@ -170,7 +170,13 @@ app.use((err, req, res, next) => {
         message: "Server error",
     });
 });
+const notificationRoutes =
+  require("./routes/notification.routes");
 
+app.use(
+  "/api/notifications",
+  notificationRoutes
+);
 // =====================================================
 // EXPORT
 // =====================================================
