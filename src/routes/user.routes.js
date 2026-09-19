@@ -8,9 +8,6 @@ const authMiddleware =
 
 const adminMiddleware =
     require("../middleware/admin.middleware");
-const {
-  updateFcmToken
-} = require("../controllers/user.controller");
 
 const {
     updateProfile,

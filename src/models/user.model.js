@@ -539,7 +539,6 @@ RETURNING *
 
     return result.rows[0];
 }
-
 }
 
 
