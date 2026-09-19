@@ -16,7 +16,9 @@ const {
     changePassword,
     deleteAccount,
     updateLocation,
-    updateFcmToken
+    updateFcmToken,
+    getNotificationSettings,
+    updateNotificationSettings
 } = require("../controllers/user.controller");
 
 
@@ -74,4 +76,16 @@ router.put(
   updateFcmToken
 );
 
+
+router.get(
+    "/notification-settings",
+    authMiddleware,
+    getNotificationSettings
+);
+
+router.put(
+    "/notification-settings",
+    authMiddleware,
+    updateNotificationSettings
+);
 module.exports = router;

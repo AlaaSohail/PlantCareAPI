@@ -132,6 +132,7 @@ class Task {
                 next_due_date = $5,
                 reminder_time = $6,
                 is_active = $7,
+                last_notified_due_date = NULL,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = $8
               AND user_id = $9
@@ -198,6 +199,7 @@ class Task {
             UPDATE plant_care_schedules
             SET
                 next_due_date = $1,
+                last_notified_due_date = NULL,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = $2
               AND user_id = $3
@@ -208,6 +210,54 @@ class Task {
 
         return result.rows[0];
     }
+    static async findDueNotifications() {
+        const result = await db.query(
+            `
+            SELECT
+                pcs.id,
+                pcs.user_id,
+                pcs.plant_id,
+                pcs.task_type,
+                pcs.title,
+                pcs.description,
+                pcs.next_due_date,
+                pcs.reminder_time,
+                p.name AS plant_name,
+                u.fcm_token,
+                u.notifications_enabled,
+                u.task_notifications_enabled,
+                u.timezone
+            FROM plant_care_schedules pcs
+            JOIN plants p ON p.id = pcs.plant_id
+            JOIN users u ON u.id = pcs.user_id
+            WHERE pcs.is_active = true
+              AND pcs.last_notified_due_date IS DISTINCT FROM pcs.next_due_date
+              AND ((pcs.next_due_date + pcs.reminder_time)
+                   AT TIME ZONE COALESCE(NULLIF(u.timezone, ''), 'UTC')) <= NOW()
+            ORDER BY pcs.next_due_date ASC, pcs.reminder_time ASC
+            `
+        );
+
+        return result.rows;
+    }
+
+    static async markNotified(id, dueDate) {
+        const result = await db.query(
+            `
+            UPDATE plant_care_schedules
+            SET
+                last_notified_due_date = $1,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $2
+              AND next_due_date = $1
+            RETURNING *
+            `,
+            [dueDate, id]
+        );
+
+        return result.rows[0];
+    }
+
 }
 
 module.exports = Task;

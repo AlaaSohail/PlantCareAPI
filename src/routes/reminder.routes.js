@@ -1,76 +1,32 @@
 const express = require("express");
-
 const router = express.Router();
-
-const authMiddleware =
-    require("../middleware/auth.middleware");
-
-
+const authMiddleware = require("../middleware/auth.middleware");
 const {
-
     createReminder,
-
     getReminders,
-
     completeReminder,
-
     deleteReminder,
-
     updateReminder,
-
-    createCarePlan
-
+    createCarePlan,
 } = require("../controllers/reminder.controller");
 
-
-
-// Create reminder for plant
-router.post(
-    "/plants/:id/reminders",
-    authMiddleware,
-    createReminder
-);
-
-
-
-// Get plant reminders
-router.get(
-    "/plants/:id/reminders",
-    authMiddleware,
-    getReminders
-);
-
-
-
-// Complete reminder
+router.post("/plants/:plantId/reminders", authMiddleware, createReminder);
+router.get("/plants/:plantId/reminders", authMiddleware, getReminders);
 router.put(
-    "/plants/:id/reminders/:id/complete",
+    "/plants/:plantId/reminders/:reminderId/complete",
     authMiddleware,
     completeReminder
 );
-
-
-
-// Delete reminder
 router.delete(
-    "/plants/:id/reminders/:id",
+    "/plants/:plantId/reminders/:reminderId",
     authMiddleware,
     deleteReminder
 );
-
 router.put(
-    "/plants/:id/reminders/:id",
+    "/plants/:plantId/reminders/:reminderId",
     authMiddleware,
     updateReminder
 );
-router.post(
-
-    "/plants/:plantId/care-plan",
-
-    authMiddleware,
-
-    createCarePlan
-
-);
+router.post("/plants/:plantId/care-plan", authMiddleware, createCarePlan);
 
 module.exports = router;

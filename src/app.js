@@ -1,40 +1,53 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 
-// =====================================================
-// PROXY
-// =====================================================
-
 app.set("trust proxy", 1);
 
-// =====================================================
-// MIDDLEWARES
-// =====================================================
+const configuredOrigins = (process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 
-app.use(cors());
+const allowedOrigins = new Set([
+    "https://alaasohail.com",
+    "https://www.alaasohail.com",
+    ...configuredOrigins,
+]);
 
-app.use(express.json());
-
+app.use(helmet());
 app.use(
-    express.urlencoded({
-        extended: true,
+    cors({
+        origin(origin, callback) {
+            // Native mobile apps/Postman normally have no browser Origin header.
+            if (!origin || allowedOrigins.has(origin)) {
+                return callback(null, true);
+            }
+            return callback(new Error("Not allowed by CORS"));
+        },
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        credentials: true,
     })
 );
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 
-// =====================================================
-// STATIC FILES
-// =====================================================
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 100,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message: "Too many requests, try again later",
+    },
+});
+app.use("/api", limiter);
 
-app.use(
-    "/uploads",
-    express.static("uploads")
-);
-
-// =====================================================
-// HOME
-// =====================================================
+app.use("/uploads", express.static("uploads"));
 
 app.get("/", (req, res) => {
     res.json({
@@ -43,124 +56,17 @@ app.get("/", (req, res) => {
     });
 });
 
-// =====================================================
-// AUTH
-// =====================================================
-
-const authRoutes = require("./routes/auth.routes");
-
-app.use(
-    "/api/auth",
-    authRoutes
-);
-
-// =====================================================
-// USERS
-// =====================================================
-
-const userRoutes = require("./routes/user.routes");
-
-app.use(
-    "/api/users",
-    userRoutes
-);
-
-// =====================================================
-// PLANTS
-// =====================================================
-
-const plantRoutes = require("./routes/plant.routes");
-
-app.use(
-    "/api/plants",
-    plantRoutes
-);
-
-// =====================================================
-// POSTS
-// =====================================================
-
-const postRoutes = require("./routes/post.routes");
-
-app.use(
-    "/api/posts",
-    postRoutes
-);
-
-// =====================================================
-// POST INTERACTIONS
-// Like / Unlike / Comments
-// =====================================================
-
-const postInteractionRoutes =
-    require("./routes/post_interaction.routes");
-
-app.use(
-    "/api",
-    postInteractionRoutes
-);
-
-// =====================================================
-// CARE
-// =====================================================
-
-const careRoutes = require("./routes/care.routes");
-
-app.use(
-    "/api",
-    careRoutes
-);
-
-// =====================================================
-// REMINDERS
-// =====================================================
-
-const reminderRoutes =
-    require("./routes/reminder.routes");
-
-app.use(
-    "/api",
-    reminderRoutes
-);
-
-// =====================================================
-// AI ANALYSIS
-// =====================================================
-
-const aiRoutes =
-    require("./routes/ai.routes");
-
-app.use(
-    "/api",
-    aiRoutes
-);
-// =====================================================
-// TASKS
-// =====================================================
-
-const taskRoutes =
-    require("./routes/task.routes");
-
-app.use(
-    "/api/tasks",
-    taskRoutes
-);
-
-// =====================================================
-// NOTIFICATIONS
-// =====================================================
-
-const notificationRoutes =
-    require("./routes/notification.routes");
-
-app.use(
-    "/api/notifications",
-    notificationRoutes
-);
-
-// =====================================================
-// 404 HANDLER
-// =====================================================
+app.use("/api/auth", require("./routes/auth.routes"));
+app.use("/api/users", require("./routes/user.routes"));
+app.use("/api/plants", require("./routes/plant.routes"));
+app.use("/api/posts", require("./routes/post.routes"));
+app.use("/api", require("./routes/post_interaction.routes"));
+app.use("/api", require("./routes/care.routes"));
+app.use("/api", require("./routes/reminder.routes"));
+app.use("/api", require("./routes/ai.routes"));
+app.use("/api/tasks", require("./routes/task.routes"));
+app.use("/api/notifications", require("./routes/notification.routes"));
+app.use("/api/weather", require("./routes/weather.routes"));
 
 app.use((req, res) => {
     res.status(404).json({
@@ -169,21 +75,20 @@ app.use((req, res) => {
     });
 });
 
-// =====================================================
-// ERROR HANDLER
-// =====================================================
-
 app.use((err, req, res, next) => {
     console.error(err);
 
-    res.status(500).json({
+    if (err.message === "Not allowed by CORS") {
+        return res.status(403).json({
+            success: false,
+            message: "Origin not allowed",
+        });
+    }
+
+    return res.status(500).json({
         success: false,
         message: "Server error",
     });
 });
-
-// =====================================================
-// EXPORT
-// =====================================================
 
 module.exports = app;

@@ -42,6 +42,11 @@ const getLocationDetails = async (
                 properties?.district ||
                 properties?.county ||
                 properties?.state ||
+                null,
+
+            timezone:
+                properties?.timezone?.name ||
+                properties?.timezone ||
                 null
 
         };
@@ -57,7 +62,8 @@ const getLocationDetails = async (
 
         return {
             country: null,
-            city: null
+            city: null,
+            timezone: null
         };
 
     }

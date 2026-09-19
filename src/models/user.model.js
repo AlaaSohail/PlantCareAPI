@@ -508,8 +508,9 @@ SET
 latitude=$1,
 longitude=$2,
 country=$3,
-city=$4
-WHERE id=$5
+city=$4,
+timezone=COALESCE($5, timezone)
+WHERE id=$6
 RETURNING *
 `,
                 [
@@ -517,6 +518,7 @@ RETURNING *
                     data.longitude,
                     data.country,
                     data.city,
+                    data.timezone ?? null,
                     id
                 ]
 
@@ -527,18 +529,84 @@ RETURNING *
 
     }
     static async updateFcmToken(id, fcmToken) {
-    const result = await db.query(
-        `
-        UPDATE users
-        SET fcm_token = $1
-        WHERE id = $2
-        RETURNING *
-        `,
-        [fcmToken, id]
-    );
+        const result = await db.query(
+            `
+            UPDATE users
+            SET fcm_token = $1
+            WHERE id = $2
+            RETURNING *
+            `,
+            [fcmToken, id]
+        );
 
-    return result.rows[0];
-}
+        return result.rows[0];
+    }
+
+    static async clearFcmToken(id) {
+        const result = await db.query(
+            `
+            UPDATE users
+            SET fcm_token = NULL
+            WHERE id = $1
+            RETURNING *
+            `,
+            [id]
+        );
+
+        return result.rows[0];
+    }
+
+    static async updateNotificationSettings(id, data) {
+        const result = await db.query(
+            `
+            UPDATE users
+            SET
+                notifications_enabled = COALESCE($1, notifications_enabled),
+                task_notifications_enabled = COALESCE($2, task_notifications_enabled),
+                weather_alerts_enabled = COALESCE($3, weather_alerts_enabled),
+                timezone = COALESCE($4, timezone)
+            WHERE id = $5
+            RETURNING
+                id,
+                notifications_enabled,
+                task_notifications_enabled,
+                weather_alerts_enabled,
+                timezone
+            `,
+            [
+                data.notifications_enabled,
+                data.task_notifications_enabled,
+                data.weather_alerts_enabled,
+                data.timezone,
+                id
+            ]
+        );
+
+        return result.rows[0];
+    }
+
+    static async findWeatherAlertUsers() {
+        const result = await db.query(
+            `
+            SELECT
+                id,
+                fcm_token,
+                latitude,
+                longitude,
+                city,
+                country,
+                timezone
+            FROM users
+            WHERE notifications_enabled = true
+              AND weather_alerts_enabled = true
+              AND fcm_token IS NOT NULL
+              AND latitude IS NOT NULL
+              AND longitude IS NOT NULL
+            `
+        );
+
+        return result.rows;
+    }
 }
 
 

@@ -1,82 +1,28 @@
 require("dotenv").config();
+
 const app = require("./src/app");
 const db = require("./src/config/database");
+
 require("./src/jobs/tokenCleanup.job");
 require("./src/jobs/reminder.job");
-const helmet = require("helmet");
-const cors = require("cors");
-const rateLimit = require("express-rate-limit");
-
-
-
-app.use(helmet());
-
-
-app.use(cors({
-
-    origin: [
-        "https://alaasohail.com",
-        "https://www.alaasohail.com"
-    ],
-
-    methods: [
-        "GET",
-        "POST",
-        "PUT",
-        "PATCH",
-        "DELETE"
-    ],
-
-    credentials: true
-
-}));
-
-
-
-const limiter = rateLimit({
-
-    windowMs: 15 * 60 * 1000,
-
-    max: 100,
-
-    message: {
-        success: false,
-        message: "Too many requests, try again later"
-    }
-
-});
-
-
-app.use("/api", limiter);
-
-
-
-// Database
-
-db.connect()
-    .then(client => {
-
-        console.log("✅ Database Connected");
-
-        client.release();
-
-    })
-    .catch(err => {
-
-        console.log("❌ Database Error");
-        console.log(err);
-
-    });
-
-
-
-// Server
+require("./src/jobs/taskNotification.job");
+require("./src/jobs/weatherAlert.job");
 
 const PORT = process.env.PORT || 3000;
 
+const start = async () => {
+    try {
+        const client = await db.connect();
+        client.release();
+        console.log("✅ Database Connected");
 
-app.listen(PORT, () => {
+        app.listen(PORT, () => {
+            console.log(`🚀 Server running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("❌ Database Error", error);
+        process.exit(1);
+    }
+};
 
-    console.log(`🚀 Server running on port ${PORT}`);
-
-});
+start();

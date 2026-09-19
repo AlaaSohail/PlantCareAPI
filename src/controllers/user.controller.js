@@ -25,7 +25,7 @@ const updateLocation = async (req, res) => {
         } = req.body;
 
 
-        if (!latitude || !longitude) {
+        if (latitude === undefined || longitude === undefined || latitude === null || longitude === null) {
 
             return res.status(400).json({
 
@@ -55,7 +55,10 @@ const updateLocation = async (req, res) => {
                         locationDetails.country,
 
                     city:
-                        locationDetails.city
+                        locationDetails.city,
+
+                    timezone:
+                        locationDetails.timezone
                 }
             );
 
@@ -700,6 +703,86 @@ const updateFcmToken = async (req, res) => {
 
 
 
+
+
+const isValidTimeZone = (timeZone) => {
+    if (typeof timeZone !== "string" || !timeZone.trim()) return false;
+
+    try {
+        Intl.DateTimeFormat("en-US", { timeZone: timeZone.trim() }).format();
+        return true;
+    } catch (_) {
+        return false;
+    }
+};
+
+const getNotificationSettings = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        return res.json({
+            success: true,
+            settings: {
+                notifications_enabled: user.notifications_enabled ?? true,
+                task_notifications_enabled: user.task_notifications_enabled ?? true,
+                weather_alerts_enabled: user.weather_alerts_enabled ?? true,
+                timezone: user.timezone || "UTC",
+            },
+        });
+    } catch (error) {
+        console.error("GET NOTIFICATION SETTINGS ERROR:", error);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+const updateNotificationSettings = async (req, res) => {
+    try {
+        const body = req.body || {};
+
+        for (const field of [
+            "notifications_enabled",
+            "task_notifications_enabled",
+            "weather_alerts_enabled",
+        ]) {
+            if (body[field] !== undefined && typeof body[field] !== "boolean") {
+                return res.status(400).json({
+                    success: false,
+                    message: `${field} must be true or false`,
+                });
+            }
+        }
+
+        if (body.timezone !== undefined && !isValidTimeZone(body.timezone)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid IANA timezone",
+            });
+        }
+
+        const settings = await User.updateNotificationSettings(req.user.id, {
+            notifications_enabled: body.notifications_enabled ?? null,
+            task_notifications_enabled: body.task_notifications_enabled ?? null,
+            weather_alerts_enabled: body.weather_alerts_enabled ?? null,
+            timezone: body.timezone?.trim() || null,
+        });
+
+        return res.json({
+            success: true,
+            message: "Notification settings updated",
+            settings,
+        });
+    } catch (error) {
+        console.error("UPDATE NOTIFICATION SETTINGS ERROR:", error);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+};
 module.exports = {
 
     profile,
@@ -714,6 +797,8 @@ module.exports = {
 
     updateLocation,
 
-    updateFcmToken
+    updateFcmToken,
+    getNotificationSettings,
+    updateNotificationSettings
 
 };
