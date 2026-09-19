@@ -145,9 +145,21 @@ app.use(
     "/api/tasks",
     taskRoutes
 );
+
+// =====================================================
+// NOTIFICATIONS
+// =====================================================
+
+const notificationRoutes =
+    require("./routes/notification.routes");
+
+app.use(
+    "/api/notifications",
+    notificationRoutes
+);
+
 // =====================================================
 // 404 HANDLER
-// IMPORTANT: MUST BE LAST
 // =====================================================
 
 app.use((req, res) => {
@@ -159,7 +171,6 @@ app.use((req, res) => {
 
 // =====================================================
 // ERROR HANDLER
-// IMPORTANT: MUST BE AFTER ALL ROUTES
 // =====================================================
 
 app.use((err, req, res, next) => {
@@ -170,13 +181,7 @@ app.use((err, req, res, next) => {
         message: "Server error",
     });
 });
-const notificationRoutes =
-  require("./routes/notification.routes");
 
-app.use(
-  "/api/notifications",
-  notificationRoutes
-);
 // =====================================================
 // EXPORT
 // =====================================================
