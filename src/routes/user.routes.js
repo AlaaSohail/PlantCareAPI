@@ -16,7 +16,8 @@ const {
     getUsers,
     changePassword,
     deleteAccount,
-    updateLocation
+    updateLocation,
+    updateFcmToken
 } = require("../controllers/user.controller");
 
 
