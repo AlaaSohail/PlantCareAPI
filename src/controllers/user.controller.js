@@ -714,5 +714,6 @@ module.exports = {
 
     updateLocation,
 
+    updateFcmToken
 
 };
