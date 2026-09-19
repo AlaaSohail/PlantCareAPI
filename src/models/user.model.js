@@ -526,6 +526,19 @@ RETURNING *
         return result.rows[0];
 
     }
+    static async updateFcmToken(id, fcmToken) {
+    const result = await db.query(
+        `
+        UPDATE users
+        SET fcm_token = $1
+        WHERE id = $2
+        RETURNING *
+        `,
+        [fcmToken, id]
+    );
+
+    return result.rows[0];
+}
 
 }
 

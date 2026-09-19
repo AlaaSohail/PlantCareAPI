@@ -68,6 +68,10 @@ router.put(
     authMiddleware,
     updateLocation
 );
-
+router.put(
+  "/fcm-token",
+  authMiddleware,
+  updateFcmToken
+);
 
 module.exports = router;

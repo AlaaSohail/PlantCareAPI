@@ -665,7 +665,38 @@ const changePassword = async (req, res) => {
 
 };
 
+const updateFcmToken = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { fcmToken } = req.body;
 
+        if (!fcmToken) {
+            return res.status(400).json({
+                success: false,
+                message: "FCM token is required"
+            });
+        }
+
+        const user = await User.updateFcmToken(
+            userId,
+            fcmToken
+        );
+
+        return res.json({
+            success: true,
+            message: "FCM token updated successfully",
+            user
+        });
+
+    } catch (error) {
+        console.error("UPDATE FCM TOKEN ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update FCM token"
+        });
+    }
+};
 
 
 
