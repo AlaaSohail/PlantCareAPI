@@ -14,268 +14,143 @@ const client = new OAuth2Client(
 // =====================================================
 
 const googleLogin = async (req, res) => {
-
     try {
-
         const { token } = req.body;
 
-
-        // ============================================
-        // Validate token
-        // ============================================
-
         if (!token) {
-
             return res.status(400).json({
-
                 success: false,
-
                 message: "Google token is required"
-
             });
-
         }
 
+        console.log("1. Google token received");
 
-        // ============================================
-        // Verify Google token
-        // ============================================
+        console.log(
+            "GOOGLE_CLIENT_ID:",
+            JSON.stringify(process.env.GOOGLE_CLIENT_ID)
+        );
 
-        const ticket =
-            await client.verifyIdToken({
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
 
-                idToken: token,
+        console.log("2. Google token verified");
 
-                audience:
-                    process.env.GOOGLE_CLIENT_ID
+        const payload = ticket.getPayload();
 
-            });
+        console.log("Google AUD:", payload.aud);
+        console.log("Google AZP:", payload.azp);
+        console.log("Google email:", payload.email);
 
-
-        const payload =
-            ticket.getPayload();
-
-
-        const googleId =
-            payload.sub;
-
-        const email =
-            payload.email
-                ?.trim()
-                ?.toLowerCase();
-
-        const name =
-            payload.name ||
-            "Google User";
-
-        const picture =
-            payload.picture || null;
-
+        const googleId = payload.sub;
+        const email = payload.email?.trim()?.toLowerCase();
+        const name = payload.name || "Google User";
+        const picture = payload.picture || null;
 
         if (!googleId || !email) {
-
             return res.status(401).json({
-
                 success: false,
-
                 message: "Invalid Google account information"
-
             });
-
         }
 
+        console.log("3. Searching by Google ID");
 
-        // ============================================
-        // Find by Google ID
-        // ============================================
+        let user = await User.findByGoogleId(googleId);
 
-        let user =
-            await User.findByGoogleId(
-                googleId
-            );
-
-
-        // ============================================
-        // If Google ID not found
-        // ============================================
+        console.log("4. findByGoogleId result:", user);
 
         if (!user) {
+            console.log("5. Searching by email:", email);
 
-            // ----------------------------------------
-            // Check existing email
-            // ----------------------------------------
+            user = await User.findByEmail(email);
 
-            user =
-                await User.findByEmail(
-                    email
-                );
-
-
-            // ----------------------------------------
-            // Existing account
-            // ----------------------------------------
+            console.log("6. findByEmail result:", user);
 
             if (user) {
-
-                /*
-                 * IMPORTANT:
-                 *
-                 * We don't automatically link Google
-                 * to an existing local account.
-                 *
-                 * This prevents account takeover if
-                 * the email/provider configuration
-                 * is not what we expect.
-                 */
-
                 if (
                     user.provider === "local" &&
                     user.password
                 ) {
-
                     return res.status(409).json({
-
                         success: false,
-
                         message:
                             "An account already exists with this email. Please login using your email and password."
-
                     });
-
                 }
 
-
-                // ------------------------------------
-                // Existing social account
-                // ------------------------------------
+                console.log("7. Updating Google ID");
 
                 await User.updateGoogleId(
                     user.id,
                     googleId
                 );
 
-                user =
-                    await User.findById(
-                        user.id
-                    );
+                user = await User.findById(user.id);
+            } else {
+                console.log("8. Creating Google user");
 
+                user = await User.create({
+                    name,
+                    email,
+                    password: null,
+                    provider: "google",
+                    userImage: picture,
+                    emailVerified: true,
+                    googleId
+                });
+
+                console.log("9. User created:", user);
             }
-
-
-            // ----------------------------------------
-            // Create new Google account
-            // ----------------------------------------
-
-            else {
-
-                user =
-                    await User.create({
-
-                        name,
-
-                        email,
-
-                        password: null,
-
-                        provider: "google",
-
-                        userImage: picture,
-
-                        emailVerified: true,
-
-                        googleId
-
-                    });
-
-            }
-
         }
 
+        console.log("10. Creating application JWT");
 
-        // ============================================
-        // Create PlantCare JWT
-        // ============================================
-
-        const jwtToken =
-            jwt.sign(
-
-                {
-                    id: user.id,
-
-                    email: user.email
-
-                },
-
-                process.env.JWT_SECRET,
-
-                {
-                    expiresIn: "30d"
-                }
-
-            );
-
-
-        // ============================================
-        // Response
-        // ============================================
-
-        return res.json({
-
-            success: true,
-
-            message: "Google login successful",
-
-            token: jwtToken,
-
-            user: {
-
+        const jwtToken = jwt.sign(
+            {
                 id: user.id,
-
-                name: user.name,
-
-                email: user.email,
-
-                phoneNumber:
-                    user.phone_number,
-
-                userImage:
-                    user.user_image,
-
-                latitude:
-                    user.latitude,
-
-                longitude:
-                    user.longitude,
-
-                country:
-                    user.country,
-
-                city:
-                    user.city
-
+                email: user.email
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "30d"
             }
-
-        });
-
-
-    } catch (error) {
-
-        console.log(
-            "GOOGLE LOGIN ERROR:",
-            error
         );
 
+        console.log("11. Google login completed");
 
-        return res.status(401).json({
-
-            success: false,
-
-            message: "Google login failed"
-
+        return res.json({
+            success: true,
+            message: "Google login successful",
+            token: jwtToken,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                phoneNumber: user.phone_number,
+                userImage: user.user_image,
+                latitude: user.latitude,
+                longitude: user.longitude,
+                country: user.country,
+                city: user.city
+            }
         });
 
-    }
+    } catch (error) {
+    console.error("========== GOOGLE LOGIN ERROR ==========");
+    console.error("Message:", error.message);
+    console.error("Code:", error.code);
+    console.error("Detail:", error.detail);
+    console.error("Stack:", error.stack);
 
+    return res.status(401).json({
+        success: false,
+        message: "Google login failed",
+        error: error.message
+    });
+}
 };
 // =====================================================
 // FACEBOOK LOGIN
